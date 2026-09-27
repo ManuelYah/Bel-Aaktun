@@ -1,0 +1,139 @@
+/* --- CONTENEDOR PRINCIPAL DEL NAVBAR --- */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 75px;
+  background-color: #1e130c !important; /* Forzar el fondo café oscuro */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- LOGO --- */
+.logo a {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
+
+.brand-sub {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.85rem;
+  color: #e2b13c; /* Dorado / Palma */
+  margin-top: 2px;
+}
+
+/* --- ENLACES EN HORIZONTAL (SIN PUNTOS) --- */
+.nav-links {
+  list-style: none !important; /* Quita los puntos/viñetas */
+  list-style-type: none !important;
+  display: flex !important; /* Fuerza la alineación en fila */
+  flex-direction: row !important;
+  align-items: center;
+  gap: 2.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #e2cca8; /* Color dorado/crema */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a:hover,
+.nav-links li a.active {
+  color: #ffffff;
+}
+
+/* --- SECCIÓN DERECHA: IDIOMA + BOTÓN --- */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+/* Selector de idioma estilo caja */
+.lang-selector {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lang-selector select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: transparent;
+  border: 1px solid rgba(226, 204, 168, 0.4);
+  border-radius: 4px;
+  color: #e2cca8;
+  padding: 0.5rem 1.8rem 0.5rem 0.9rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.lang-selector select option {
+  background-color: #1e130c;
+  color: #e2cca8;
+}
+
+.custom-arrow {
+  position: absolute;
+  right: 0.7rem;
+  pointer-events: none;
+  color: #e2cca8;
+  font-size: 0.8rem;
+}
+
+/* Botón Terracota Destacado */
+.btn-reservar {
+  background-color: #c85e3a !important;
+  color: #ffffff !important;
+  padding: 0.65rem 1.4rem;
+  border-radius: 5px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+.btn-reservar:hover {
+  background-color: #b04e2d !important;
+}

@@ -1,0 +1,39 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    
+    <!-- Logo Bécal -->
+    <div class="logo">
+      <a routerLink="/">
+        <span class="brand-title">Bel-Aaktun</span>
+        <span class="brand-sub">Ruta de las Cuevas</span>
+      </a>
+    </div>
+
+    <!-- Enlaces de navegación -->
+    <ul class="nav-links">
+  <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Inicio</a></li>
+  <li><a href="#tradicion">Tradición</a></li>
+  <li><a routerLink="/catalogo">Catálogo</a></li>
+  
+  <!-- Actualiza esto a /cuevas-mapa -->
+  <li><a routerLink="/cuevas-mapa">Mapa</a></li>
+  
+  <li><a routerLink="/contacto">Contacto</a></li>
+</ul>
+
+    <!-- Acciones (Idioma + Reserva) -->
+    <div class="nav-actions">
+      <div class="lang-selector">
+        <select id="language" aria-label="Seleccionar idioma">
+          <option value="es">ES</option>
+          <option value="en">EN</option>
+          <option value="may">MAY</option>
+        </select>
+        <span class="custom-arrow">⌵</span>
+      </div>
+
+      <a routerLink="/crear-reserva" class="btn-reservar">Acceso de artesanos</a>
+    </div>
+
+  </div>
+</nav>
