@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Variables de color y tipografía */
+:root {
+  --font-heading: 'Playfair Display', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  
+  /* Paleta de colores inspirada en la maqueta */
+  --color-bg-light: #f7f4ee;   /* Fondo crema/arena */
+  --color-bg-dark: #221510;    /* Fondo marrón cueva */
+  --color-accent: #c45b35;     /* Terracota / Barro */
+  --color-green: #3a5343;      /* Verde selva artesanal */
+  --color-text-dark: #2c1a12;
+}
+
+/* Tipografía base para todo el cuerpo */
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-bg-light);
+  color: var(--color-text-dark);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tipografía para todos los títulos (Encabezados estilo Serif) */
+h1, h2, h3, h4, .brand-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+html {
+  scroll-behavior: smooth;
+}
