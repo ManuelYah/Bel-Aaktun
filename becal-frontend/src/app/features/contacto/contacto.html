@@ -1,0 +1,60 @@
+<section class="contacto-section">
+  <div class="container">
+    
+    <!-- Info Card -->
+    <div class="info-card">
+      <h2>Ponte en contacto con Bel Áaktun</h2>
+      <p class="subtitle">Descubre las cuevas y el arte del tejido de sombreros jipi en Bécal, Campeche.</p>
+      
+      <div class="datos-lista">
+        <div class="dato-item">
+          <strong>WhatsApp</strong>
+          <a [href]="'https://wa.me/' + whatsappNumero" target="_blank">+52 996 963 2246</a>
+        </div>
+        
+        <div class="dato-item">
+          <strong>Correo Electrónico</strong>
+          <a [href]="'mailto:' + correo">{{ correo }}</a>
+        </div>
+
+        <div class="dato-item">
+          <strong>Ubicación</strong>
+          <span>Bécal, Calkiní, Campeche, México</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="form-card">
+      <h3>Envíanos un mensaje directo</h3>
+      <form>
+        <div class="form-group">
+          <label for="nombre">Nombre completo</label>
+          <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" placeholder="Tu nombre" required>
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono (opcional)</label>
+          <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono" placeholder="Tu número">
+        </div>
+
+        <div class="form-group">
+          <label for="mensaje">Mensaje o Consulta</label>
+          <textarea id="mensaje" [(ngModel)]="mensaje" name="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
+        </div>
+
+        <!-- Grupo de botones -->
+        <div class="form-actions">
+          <button type="button" (click)="enviarWhatsApp()" class="btn-whatsapp">
+            Enviar a WhatsApp
+          </button>
+          
+          <button type="button" (click)="enviarCorreo()" class="btn-email">
+            Enviar por Correo
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</section>

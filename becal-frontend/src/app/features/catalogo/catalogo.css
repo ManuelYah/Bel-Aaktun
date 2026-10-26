@@ -1,0 +1,483 @@
+.catalogo-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Inter', sans-serif;
+  color: #2c221e;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sub-title {
+  color: #c85a32;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.header-section h1 {
+  font-size: 2.2rem;
+  margin: 10px 0;
+  color: #1e1b18;
+}
+
+.desc {
+  color: #6b5c56;
+  font-size: 1rem;
+}
+
+/* Tarjeta de Filtros */
+.filters-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  background: #fdfbf7;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e6dec5;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #8c7a6b;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.filter-group select {
+  padding: 10px;
+  border: 1px solid #d4c5a9;
+  border-radius: 6px;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+  color: #2c221e;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: #c85a32;
+}
+
+.results-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.btn-clear {
+  background: none;
+  border: none;
+  color: #c85a32;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.btn-clear:hover {
+  color: #a04423;
+}
+
+/* Grid de Productos */
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 25px;
+}
+
+.producto-card {
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eee5d3;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-container {
+  position: relative;
+  height: 220px;
+  background-color: #f4f0eb;
+  overflow: hidden;
+}
+
+.producto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.producto-card:hover .producto-img {
+  transform: scale(1.03);
+}
+
+.badge-calidad {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(30, 27, 24, 0.85);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.card-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-body h3 {
+  font-size: 1.25rem;
+  margin: 0 0 8px 0;
+  color: #1e1b18;
+  font-weight: 700;
+}
+
+.descripcion {
+  color: #6b5c56;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0 0 20px 0;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0ead6;
+  padding-top: 14px;
+  margin-top: auto;
+}
+
+.precio {
+  font-weight: 700;
+  color: #1e3a8a;
+  font-size: 1.15rem;
+}
+
+.btn-detalles {
+  background-color: #c85a32;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-detalles:hover {
+  background-color: #a04423;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: #777;
+  font-size: 1.1rem;
+}
+
+.taller-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #c85a32;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.pieza-titulo {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e1b18;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+/* Overlay modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.btn-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.modal-body-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+@media (max-width: 600px) {
+  .modal-body-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.modal-img {
+  width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.modal-taller-tag {
+  color: #c85a32;
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+.modal-title {
+  margin: 5px 0;
+  font-size: 1.5rem;
+}
+
+.modal-precio {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #1e3a8a;
+}
+
+.taller-info-box {
+  background: #fdfbf7;
+  border: 1px solid #e6dec5;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 0.9rem;
+}
+
+.taller-info-box h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: #2c221e;
+}
+
+.maps-link {
+  color: #c85a32;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-apartar, .btn-confirmar {
+  background: #2d5a27;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-cancelar {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Formulario apartar */
+.modal-form {
+  max-width: 500px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.form-group input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.modal-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* --- BARRA DE FILTROS --- */
+.catalogo-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.filtros-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eae5d9;
+  margin-bottom: 12px;
+}
+
+.filtro-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.filtro-item label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c757d;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.filtro-item select {
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background-color: #fdfbf7;
+  font-size: 0.9rem;
+  color: #2c221e;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtro-item select:focus {
+  border-color: #c85a32;
+}
+
+.limpiar-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 25px;
+}
+
+.btn-limpiar {
+  background: none;
+  border: none;
+  color: #c85a32;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.btn-limpiar:hover {
+  color: #a04320;
+}
+
+/* --- ESTILOS PARA ENLACES DE CONTACTO (WHATSAPP Y LLAMADA) --- */
+.contacto-link {
+  font-weight: bold;
+  text-decoration: none;
+  margin-right: 4px;
+}
+
+.whatsapp-link {
+  color: #25d366;
+}
+
+.whatsapp-link:hover {
+  text-decoration: underline;
+}
+
+.llamada-link {
+  color: #1e3a8a;
+}
+
+.llamada-link:hover {
+  text-decoration: underline;
+}
+
+.separador {
+  color: #ccc;
+  margin: 0 4px;
+}
+
+.catalogo-container {
+  padding-top: 100px; /* <--- Espacio para evitar que el navbar sobreponga los filtros */
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}

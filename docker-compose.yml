@@ -1,7 +1,7 @@
 services:
   mysql_db:
     image: mysql:8.0
-    container_name: belaaktun_mysql
+    container_name: becal_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root_password
@@ -16,7 +16,7 @@ services:
 
   backend:
     build: ./becal-backend
-    container_name: belaaktun_flask
+    container_name: becal_flask
     restart: always
     ports:
       - "5000:5000"

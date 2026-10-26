@@ -7,7 +7,7 @@ import { Artesania } from '../models/artesania.model';
   providedIn: 'root'
 })
 export class ArtesaniasService {
-  private apiUrl = 'http://localhost:5000/api/artesanias';
+  private apiUrl = 'http://127.0.0.1:5000/api/productos';
 
   constructor(private http: HttpClient) {}
 
@@ -15,5 +15,3 @@ export class ArtesaniasService {
     return this.http.get<Artesania[]>(this.apiUrl);
   }
 }
-
-
