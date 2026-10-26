@@ -1,0 +1,412 @@
+<div class="dashboard-layout">
+
+  <!-- Boton para abrir/cerrar el menu en dispositivos moviles -->
+  <button
+    type="button"
+    class="sidebar-toggle"
+    (click)="alternarMenu()"
+    [attr.aria-expanded]="menuAbierto"
+    aria-controls="dashboard-sidebar">
+    <span aria-hidden="true">☰</span>
+    {{ menuAbierto ? 'Cerrar menú' : 'Menú' }}
+  </button>
+
+  <!-- Fondo oscuro que cierra el menu en moviles -->
+  <div
+    class="sidebar-backdrop"
+    *ngIf="menuAbierto"
+    (click)="cerrarMenu()">
+  </div>
+
+  <!-- PANEL LATERAL -->
+  <aside
+    id="dashboard-sidebar"
+    class="dashboard-sidebar"
+    [class.sidebar-open]="menuAbierto">
+
+    <div class="sidebar-brand">
+      <span class="sidebar-brand-icon" aria-hidden="true">✦</span>
+      <div>
+        <strong>Bel-Aaktun</strong>
+        <small>Panel del artesano</small>
+      </div>
+    </div>
+
+    <p class="sidebar-label">GESTIÓN DEL TALLER</p>
+
+    <nav class="sidebar-nav" aria-label="Navegación del dashboard">
+      <button
+        type="button"
+        class="sidebar-link"
+        [class.active]="seccionActiva === 'productos'"
+        [attr.aria-current]="seccionActiva === 'productos' ? 'page' : null"
+        (click)="cambiarSeccion('productos')">
+        <span class="sidebar-icon" aria-hidden="true">▦</span>
+        <span class="sidebar-link-text">Productos</span>
+        <span class="sidebar-count">{{ productos.length }}</span>
+      </button>
+
+      <button
+        type="button"
+        class="sidebar-link"
+        [class.active]="seccionActiva === 'apartados'"
+        [attr.aria-current]="seccionActiva === 'apartados' ? 'page' : null"
+        (click)="cambiarSeccion('apartados')">
+        <span class="sidebar-icon" aria-hidden="true">▤</span>
+        <span class="sidebar-link-text">Apartados</span>
+        <span
+          class="sidebar-count"
+          [class.count-pending]="apartadosPendientes > 0">
+          {{ apartadosPendientes }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="sidebar-link"
+        [class.active]="seccionActiva === 'reservas'"
+        [attr.aria-current]="seccionActiva === 'reservas' ? 'page' : null"
+        (click)="cambiarSeccion('reservas')">
+        <span class="sidebar-icon" aria-hidden="true">▣</span>
+        <span class="sidebar-link-text">Reservas</span>
+        <span
+          class="sidebar-count"
+          [class.count-pending]="reservasPendientes > 0">
+          {{ reservasPendientes }}
+        </span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-status-dot" aria-hidden="true"></span>
+      <span>{{ nombreTallerSesion || 'Mi taller artesanal' }}</span>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL -->
+  <main class="dashboard-main">
+    <div class="dashboard-container">
+  
+  <ng-container *ngIf="seccionActiva === 'productos'">
+
+  <!-- Formulario de Agregar / Editar Productos -->
+  <section class="dashboard-section">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="dashboard-title">
+        {{ modoEdicion ? 'Editar Producto en Catálogo' : 'Agregar Nuevo Producto' }}
+      </h2>
+      <button *ngIf="modoEdicion" type="button" (click)="cancelarEdicion()" class="btn-cancelar">
+        Cancelar Edición
+      </button>
+    </div>
+    
+    <form (ngSubmit)="guardarProducto()" class="form-grid">
+      <div class="form-group">
+        <label for="nombrePieza">Nombre de la Pieza *</label>
+        <input 
+          type="text" 
+          id="nombrePieza" 
+          [(ngModel)]="nuevoProducto.nombre_pieza" 
+          name="nombre_pieza" 
+          placeholder="Ej. Sombrero Clásico de Jipijapa" 
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="partidas">Calidad / Partidas</label>
+        <input 
+          type="text" 
+          id="partidas" 
+          name="calidad_partidas"
+          [(ngModel)]="nuevoProducto.calidad" 
+          placeholder="Ej. Fina / 3 Partidas"
+          required>
+      </div>
+
+      <div class="form-group">
+        <label for="precio">Precio ($ MXN)</label>
+        <input 
+          type="number" 
+          id="precio" 
+          name="precio_promedio"
+          [(ngModel)]="nuevoProducto.precio" 
+          placeholder="1200"
+          min="0"
+          required>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion" 
+          name="descripcion"
+          [(ngModel)]="nuevoProducto.descripcion" 
+          placeholder="Detalles del tejido en cueva tradicional..."></textarea>
+      </div>
+
+      <!-- Sección de Imágenes (Hasta 3 archivos locales) -->
+      <div class="form-group full-width imagenes-container">
+        <div class="flex justify-between items-center mb-2">
+          <label>Fotografías del Producto (Máximo 3 desde tu equipo)</label>
+          <button 
+            type="button" 
+            (click)="agregarCampoImagen()" 
+            [disabled]="nuevoProducto.imagenes && nuevoProducto.imagenes.length >= 3"
+            class="btn-add-img">
+            + Agregar otra imagen
+          </button>
+        </div>
+
+        <div class="grid-imagenes-inputs">
+          <div *ngFor="let img of nuevoProducto.imagenes; let i = index; trackBy: trackByIndex" class="input-img-row">
+            <span class="badge-img-num">Img {{ i + 1 }}</span>
+            
+            <!-- Selector de archivo local -->
+            <input 
+              type="file" 
+              accept="image/*"
+              (change)="onFileSelected($event, i)"
+              class="input-file-img">
+
+            <!-- Previsualización -->
+            <img *ngIf="img && img.trim() !== ''" [src]="img" class="thumb-preview" alt="Vista previa">
+
+            <button type="button" (click)="eliminarCampoImagen(i)" class="btn-del-img" title="Quitar imagen">✕</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <button type="submit" class="btn-primary">
+          {{ modoEdicion ? 'Actualizar Producto' : 'Guardar en Catálogo' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Tabla de Productos Registrados -->
+  <section class="dashboard-section">
+    <h3 class="dashboard-title">Tus Productos Registrados</h3>
+    
+    <div class="table-responsive">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Producto / Taller</th>
+            <th>Calidad</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prod of productos">
+            <td class="product-info flex items-center gap-3">
+              <img 
+                [src]="prod.imagen_url || (prod.imagenes && prod.imagenes[0]) || 'assets/placeholder.jpg'" 
+                alt="Miniatura" 
+                class="thumb-tabla"
+                onerror="this.src='assets/placeholder.jpg'">
+              <div>
+                <strong>{{ prod.nombre_pieza }}</strong>
+                <p class="text-xs text-gray-500">{{ prod.descripcion || 'Sin descripción detallada.' }}</p>
+              </div>
+            </td>
+            <td>{{ prod.calidad }}</td>
+            <td>${{ prod.precio }} MXN</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn-edit" (click)="prepararEdicion(prod)">Editar</button>
+                <button class="btn-delete" (click)="eliminarProducto(prod.id)">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="productos.length === 0">
+            <td colspan="4" class="empty-msg">No hay productos registrados en el catálogo.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  </ng-container>
+
+  <ng-container *ngIf="seccionActiva === 'apartados'">
+
+  <!-- Tabla de Solicitudes de Apartados de Productos -->
+  <section class="dashboard-section">
+    <h3 class="dashboard-title">Solicitudes de Apartados de Productos</h3>
+
+    <div class="table-responsive">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cliente</th>
+            <th>Cantidad</th>
+            <th>Contacto</th>
+            <th>Estado</th>
+            <th>Respuesta Enviada</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ap of apartados">
+            <td><strong>{{ ap.nombre_pieza || 'Pieza #' + ap.producto_id }}</strong></td>
+            <td>{{ ap.nombre_cliente }}</td>
+            <td>{{ ap.cantidad }} pieza(s)</td>
+            <td>
+              <a [href]="'https://wa.me/' + ap.telefono_cliente" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+                💬 {{ ap.telefono_cliente }}
+              </a>
+              <br>
+              <small *ngIf="ap.email_cliente" class="text-sub">{{ ap.email_cliente }}</small>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="ap.estado.toLowerCase()">
+                {{ ap.estado }}
+              </span>
+            </td>
+            <td>
+              <small *ngIf="ap.respuesta_artesano" class="respuesta-texto">"{{ ap.respuesta_artesano }}"</small>
+              <small *ngIf="!ap.respuesta_artesano" class="text-gray-400">Sin respuesta previa</small>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  class="btn-accept" 
+                  (click)="abrirModalRespuesta(ap, 'Confirmar')">
+                  {{ ap.estado === 'Pendiente' ? 'Aceptar' : 'Reenviar' }}
+                </button>
+
+                <button 
+                  class="btn-cancel" 
+                  (click)="abrirModalRespuesta(ap, 'Cancelar')">
+                  Rechazar
+                </button>
+
+                <button 
+                  class="btn-delete" 
+                  (click)="eliminarApartado(ap.id)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="apartados.length === 0">
+            <td colspan="7" class="empty-msg">No hay solicitudes de apartado recibidas por el momento.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  </ng-container>
+
+  <ng-container *ngIf="seccionActiva === 'reservas'">
+
+  <!-- Tabla de Reservas del Taller -->
+  <section class="dashboard-section">
+    <h3 class="dashboard-title">Citas y Reservas Recibidas</h3>
+
+    <div class="table-responsive">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Visitante</th>
+            <th>Contacto</th>
+            <th>Personas</th>
+            <th>Fecha y Hora</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let res of reservas">
+            <td><strong>{{ res.nombre_visitante }}</strong></td>
+            <td>
+              <a [href]="'https://wa.me/' + res.telefono_visitante" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+                💬 {{ res.telefono_visitante }}
+              </a>
+              <br>
+              <small class="text-sub">{{ res.email_visitante }}</small>
+            </td>
+            <td>{{ res.numero_personas }} pers.</td>
+            <td>{{ res.fecha_reserva }} a las {{ res.hora_reserva }} hrs</td>
+            <td>
+              <span class="badge" [ngClass]="res.estado.toLowerCase()">
+                {{ res.estado }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  *ngIf="res.estado !== 'ACEPTADA'" 
+                  class="btn-accept" 
+                  (click)="cambiarEstadoReserva(res.id, 'ACEPTADA')">
+                  Aceptar
+                </button>
+                
+                <button 
+                  *ngIf="res.estado !== 'CANCELADA'" 
+                  class="btn-cancel" 
+                  (click)="cambiarEstadoReserva(res.id, 'CANCELADA')">
+                  Cancelar
+                </button>
+
+                <button 
+                  class="btn-delete" 
+                  (click)="eliminarReserva(res.id)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="reservas.length === 0">
+            <td colspan="6" class="empty-msg">No se han recibido reservas registradas por el momento.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  </ng-container>
+    </div>
+  </main>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL DE RESPUESTA A SOLICITUD DE APARTADO -->
+<!-- ========================================== -->
+<div *ngIf="mostrarModalRespuesta && apartadoSeleccionado" class="modal-overlay">
+  <div class="modal-card modal-respuesta">
+    <div class="modal-header">
+      <h3>{{ accionModal === 'Confirmar' ? 'Confirmar y Responder Apartado' : 'Rechazar / Notificar Estado' }}</h3>
+      <button type="button" class="btn-close" (click)="cerrarModalRespuesta()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p><strong>Cliente:</strong> {{ apartadoSeleccionado.nombre_cliente }}</p>
+      <p><strong>Pieza Solicitada:</strong> {{ apartadoSeleccionado.nombre_pieza }} ({{ apartadoSeleccionado.cantidad }} piezas)</p>
+
+      <div class="form-group full-width my-3">
+        <label>Canal para enviar la respuesta:</label>
+        <select [(ngModel)]="medioContacto" class="input-select">
+          <option value="whatsapp">💬 WhatsApp ({{ apartadoSeleccionado.telefono_cliente }})</option>
+          <option value="email" *ngIf="apartadoSeleccionado.email_cliente">✉️ Correo Electrónico ({{ apartadoSeleccionado.email_cliente }})</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width my-3">
+        <label>Mensaje para el cliente (puedes adaptarlo antes de enviar):</label>
+        <textarea [(ngModel)]="mensajeArtesano" rows="5" class="input-textarea"></textarea>
+      </div>
+
+      <div class="modal-actions-right flex justify-end gap-2 mt-4">
+        <button type="button" class="btn-cancelar" (click)="cerrarModalRespuesta()">Cancelar</button>
+        <button type="button" class="btn-primary" (click)="enviarRespuestaYActualizar()">
+          Enviar por {{ medioContacto === 'whatsapp' ? 'WhatsApp' : 'Correo' }} y Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

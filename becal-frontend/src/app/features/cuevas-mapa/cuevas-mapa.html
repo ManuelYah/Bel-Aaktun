@@ -1,0 +1,55 @@
+<div class="cuevas-page-container">
+  
+  <header class="cuevas-header">
+    <span class="subtitulo-tag">✦ UBICACIONES TRADICIONALES</span>
+    <h1 class="titulo-principal">Mapa de Cuevas y Talleres</h1>
+    <p class="descripcion">
+      Encuentra la ubicación exacta de las cuevas donde se tejen artesanalmente los sombreros de Jipi y Palma en Bécal.
+    </p>
+  </header>
+
+  <div class="cuevas-layout">
+    
+    <!-- Sidebar con la lista de talleres -->
+    <aside class="sidebar-cuevas">
+      <h2 class="sidebar-titulo">Cuevas Registradas</h2>
+      <div class="lista-cuevas">
+        <div 
+          *ngFor="let cueva of cuevas" 
+          class="item-cueva"
+          (click)="centrarEnCueva(cueva.lat, cueva.lng)"
+        >
+          <div class="item-header">
+            <h3>{{ cueva.nombre_taller }}</h3>
+            <span class="precio">${{ cueva.precio_promedio }} MXN</span>
+          </div>
+          <p class="encargado"><strong>Encargado:</strong> {{ cueva.artesano_encargado }}</p>
+          <span class="badge">{{ cueva.calidad_partidas }}</span>
+
+          <!-- Botón para abrir el modal desde la tarjeta -->
+          <button 
+            type="button"
+            class="btn-reserva-card" 
+            (click)="abrirReserva(cueva); $event.stopPropagation()">
+            📅 Reservar Visita
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenedor principal del Mapa Leaflet -->
+    <main class="mapa-wrapper">
+      <div id="mapa-cuevas"></div>
+    </main>
+
+  </div>
+
+  <!-- Modal emergente para la reserva (fuera del layout principal para superposición z-index limpia) -->
+  <app-crear-reserva 
+    *ngIf="mostrarModalReserva && tallerSeleccionado"
+    [tallerId]="tallerSeleccionado.id"
+    [nombreTaller]="tallerSeleccionado.nombre_taller"
+    (cerrarModal)="cerrarModal()">
+  </app-crear-reserva>
+
+</div>

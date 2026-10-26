@@ -1,0 +1,184 @@
+<div class="catalogo-container">
+  
+  <!-- Barra de Filtros -->
+  <div class="filtros-bar">
+    <div class="filtro-item">
+      <label>TALLER / CUEVA</label>
+      <select [(ngModel)]="tallerSeleccionado" (change)="aplicarFiltros()">
+        <option value="todos">Todos los talleres</option>
+        <option *ngFor="let t of talleres" [value]="t.id">{{ t.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="filtro-item">
+      <label>CALIDAD</label>
+      <select [(ngModel)]="calidadSeleccionada" (change)="aplicarFiltros()">
+        <option value="todas">Todas las calidades</option>
+        <option value="Fina">Fina</option>
+        <option value="Superfina">Superfina</option>
+        <option value="Gruesa">Gruesa</option>
+      </select>
+    </div>
+
+    <div class="filtro-item">
+      <label>PRECIO</label>
+      <select [(ngModel)]="ordenPrecio" (change)="aplicarFiltros()">
+        <option value="sin_orden">Sin ordenar</option>
+        <option value="menor_mayor">Precio: Menor a Mayor</option>
+        <option value="mayor_menor">Precio: Mayor a Menor</option>
+      </select>
+    </div>
+
+    <div class="filtro-item">
+      <label>FECHA DE PUBLICACIÓN</label>
+      <select [(ngModel)]="ordenFecha" (change)="aplicarFiltros()">
+        <option value="recientes">Más recientes primero</option>
+        <option value="antiguos">Más antiguos primero</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="limpiar-container">
+    <button class="btn-limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
+  </div>
+
+  <!-- Estado de Carga -->
+  <div *ngIf="cargando" class="loading-state">
+    <p>Cargando catálogo de artesanías...</p>
+  </div>
+
+  <!-- Sin Resultados -->
+  <div *ngIf="!cargando && filteredArtesanias.length === 0" class="empty-state">
+    <p>No se encontraron piezas artesanales con los filtros seleccionados.</p>
+  </div>
+
+  <!-- Grid de Productos / Artesanías -->
+  <div *ngIf="!cargando && filteredArtesanias.length > 0" class="productos-grid">
+    <div *ngFor="let item of filteredArtesanias" class="producto-card">
+      <div class="card-img-container">
+        <img [src]="item.imagen_url || 'assets/placeholder.jpg'" [alt]="item.nombre_pieza || item.nombre_taller" class="producto-img">
+        <span class="badge-calidad">{{ item.calidad || item.calidad_partidas || 'Fina' }}</span>
+      </div>
+      
+      <div class="card-body">
+        <!-- Nombre del Taller / Cueva -->
+        <span class="taller-tag">
+          📍 {{ item.nombre_taller || 'Taller Artesanal' }}
+        </span>
+
+        <!-- Nombre de la Pieza -->
+        <h3 class="pieza-titulo">
+          {{ item.nombre_pieza || item.nombre_taller }}
+        </h3>
+
+        <!-- Descripción -->
+        <p class="descripcion">
+          {{ item.descripcion || 'Pieza elaborada artesanalmente en cueva tradicional.' }}
+        </p>
+
+        <div class="card-footer">
+          <span class="precio">${{ (item.precio || item.precio_promedio || 0) | number:'1.2-2' }} MXN</span>
+          <button class="btn-detalles" (click)="abrirDetalles(item)">Ver detalles</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL 1: DETALLES DEL PRODUCTO Y TALLER   -->
+<!-- ========================================== -->
+<div *ngIf="mostrarModalDetalles && productoSeleccionado" class="modal-overlay">
+  <div class="modal-card">
+    <button class="btn-close" (click)="cerrarModales()">✕</button>
+
+    <div class="modal-body-grid">
+      <!-- Imagen del Producto -->
+      <div class="modal-img-col">
+        <img [src]="productoSeleccionado.imagen_url || 'assets/placeholder.jpg'" [alt]="productoSeleccionado.nombre_pieza" class="modal-img">
+      </div>
+
+      <!-- Información del Producto y Taller -->
+      <div class="modal-info-col">
+        <span class="modal-taller-tag">📍 {{ productoSeleccionado.nombre_taller || 'Taller Artesanal' }}</span>
+        <h2 class="modal-title">{{ productoSeleccionado.nombre_pieza || productoSeleccionado.nombre_taller }}</h2>
+        <p class="modal-precio">${{ (productoSeleccionado.precio || productoSeleccionado.precio_promedio || 0) | number:'1.2-2' }} MXN</p>
+        <span class="badge-calidad-modal">Calidad: {{ productoSeleccionado.calidad || productoSeleccionado.calidad_partidas || 'Fina' }}</span>
+
+        <p class="modal-desc">{{ productoSeleccionado.descripcion || 'Pieza elaborada artesanalmente en cueva tradicional.' }}</p>
+
+        <!-- Información traída de la tabla artesanias -->
+        <div class="taller-info-box">
+          <h3>Información del Taller / Cueva</h3>
+          <p><strong>Artesano a Cargo:</strong> {{ productoSeleccionado.artesano_encargado || 'No especificado' }}</p>
+          <p>
+            <strong>WhatsApp / Teléfono:</strong> 
+            <ng-container *ngIf="productoSeleccionado.telefono_whatsapp; else sinTelefono">
+              <a [href]="'https://wa.me/' + productoSeleccionado.telefono_whatsapp" target="_blank" class="contacto-link whatsapp-link">
+                💬 {{ productoSeleccionado.telefono_whatsapp }} (WhatsApp)
+              </a>
+              <span class="separador"> | </span>
+              <a [href]="'tel:+' + productoSeleccionado.telefono_whatsapp" class="contacto-link llamada-link">
+                📞 Llamar
+              </a>
+            </ng-container>
+            <ng-template #sinTelefono>No disponible</ng-template>
+          </p>
+          <p *ngIf="productoSeleccionado.google_maps_url">
+            <strong>Ubicación:</strong> 
+            <a [href]="productoSeleccionado.google_maps_url" target="_blank" class="maps-link">Ver en Google Maps 📍</a>
+          </p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-apartar" (click)="abrirFormularioApartado()">Apartar Producto</button>
+          <button class="btn-cancelar" (click)="cerrarModales()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL 2: FORMULARIO APARTAR PRODUCTO      -->
+<!-- ========================================== -->
+<div *ngIf="mostrarModalApartado && productoSeleccionado" class="modal-overlay">
+  <div class="modal-card modal-form">
+    <div class="modal-header">
+      <h2>Apartar Producto: {{ productoSeleccionado.nombre_pieza || productoSeleccionado.nombre_taller }}</h2>
+      <button class="btn-close" (click)="cerrarModales()">✕</button>
+    </div>
+
+    <p class="modal-subtitle">Taller: <strong>{{ productoSeleccionado.nombre_taller }}</strong></p>
+
+    <form (ngSubmit)="confirmarApartado()" class="apartar-form">
+      <div class="form-group">
+        <label>Nombre Completo *</label>
+        <input type="text" [(ngModel)]="formularioApartado.nombre_cliente" name="nombre_cliente" placeholder="Ej. Ana Martínez" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" [(ngModel)]="formularioApartado.email_cliente" name="email_cliente" placeholder="ana@email.com">
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono (WhatsApp) *</label>
+          <input type="tel" [(ngModel)]="formularioApartado.telefono_cliente" name="telefono_cliente" placeholder="529991234567" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Cantidad de Piezas *</label>
+        <input type="number" [(ngModel)]="formularioApartado.cantidad" name="cantidad" min="1" required>
+      </div>
+
+      <div class="modal-actions-right">
+        <button type="button" class="btn-cancelar" (click)="cerrarModales()">Cancelar</button>
+        <button type="submit" class="btn-confirmar">Confirmar Apartado</button>
+      </div>
+    </form>
+  </div>
+</div>
