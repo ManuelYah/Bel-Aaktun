@@ -1,0 +1,106 @@
+/* Contenedor Principal */
+.registro-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+  background-color: #f9f8f5;
+}
+
+.registro-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  border: 1px solid #e2e0d8;
+}
+
+.registro-title {
+  color: #c85a32;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.registro-subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+/* Campos de Formulario */
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 6px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #333;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #c85a32;
+  box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.15);
+}
+
+.form-input::placeholder {
+  color: #aaa;
+}
+
+/* Botón de Enviar */
+.btn-submit {
+  width: 100%;
+  background-color: #c85a32;
+  color: #ffffff;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  margin-top: 10px;
+}
+
+.btn-submit:hover {
+  background-color: #b04e2a;
+}
+
+.btn-submit:active {
+  transform: scale(0.99);
+}
+
+/* Enlace a Login */
+.login-redirect {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.88rem;
+  color: #666;
+}
+
+.login-redirect a {
+  color: #c85a32;
+  font-weight: 600;
+  text-decoration: none;
+}

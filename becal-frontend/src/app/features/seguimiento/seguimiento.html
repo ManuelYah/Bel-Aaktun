@@ -1,0 +1,166 @@
+<div class="seguimiento-wrapper">
+  <div class="seguimiento-card">
+    <h2>Consulta el estado de tu Reserva o Apartado</h2>
+    <p>Ingresa tu correo, número de celular o número de folio (Ej. RES-7 o APT-3).</p>
+
+    <div class="search-box">
+      <input type="text" [(ngModel)]="terminoBusqueda" placeholder="Ej. RES-7, 9961072280 o correo@gmail.com" (keyup.enter)="buscarSeguimiento()">
+      <button (click)="buscarSeguimiento()" [disabled]="cargando">
+        {{ cargando ? 'Buscando...' : 'Consultar' }}
+      </button>
+    </div>
+
+    <div *ngIf="mensajeError" class="alert-error">
+      {{ mensajeError }}
+    </div>
+
+    <!-- SECCIÓN DE FILTROS -->
+    <div *ngIf="datosBrutos" class="filtros-container">
+      <div class="filtro-grupo">
+        <label>Mostrar:</label>
+        <select [(ngModel)]="filtroTipo">
+          <option value="todos">Reservas y Apartados</option>
+          <option value="reservas">Solo Reservas</option>
+          <option value="apartados">Solo Apartados</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label>Orden:</label>
+        <select [(ngModel)]="filtroOrden">
+          <option value="reciente">Más reciente</option>
+          <option value="antiguo">Más antiguo</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label>Taller:</label>
+        <select [(ngModel)]="filtroTaller">
+          <option value="">Todos los talleres</option>
+          <option *ngFor="let t of talleresDisponibles" [value]="t">{{ t }}</option>
+        </select>
+      </div>
+
+      <div class="filtro-grupo">
+        <label>Estado:</label>
+        <select [(ngModel)]="filtroEstado">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="completado">Completado</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- TARJETAS CLICKABLES -->
+    <div *ngIf="datosBrutos" class="resultados-container">
+      <p class="contador-resultados" *ngIf="resultadosFiltrados.length > 0">
+        Mostrando {{ resultadosPaginados.length }} de {{ resultadosFiltrados.length }} resultado(s)
+      </p>
+
+      <div *ngIf="resultadosFiltrados.length === 0" class="no-resultados">
+        No hay registros que coincidan con los filtros seleccionados.
+      </div>
+
+      <div *ngFor="let item of resultadosPaginados" class="item-card clickable" (click)="abrirDetalle(item)">
+        <div class="item-header">
+          <span class="badge-tipo" [class.es-reserva]="item.tipoElemento === 'reserva'">
+            {{ item.tipoElemento === 'reserva' ? '📅 Reserva de Visita' : '🛍️ Apartado de Pieza' }}
+          </span>
+          <span class="badge-folio">
+            Folio: #{{ item.tipoElemento === 'reserva' ? 'RES' : 'APT' }}-{{ item.data.id | number:'3.0-0' }}
+          </span>
+          <span class="badge-estado" [class.confirmada]="item.data.estado?.toLowerCase() === 'confirmada'">
+            {{ item.data.estado }}
+          </span>
+        </div>
+
+        <p><strong>Taller:</strong> {{ item.data.nombre_taller }}</p>
+        <p *ngIf="item.data.fecha_visita"><strong>Fecha:</strong> {{ item.data.fecha_visita }}</p>
+        <p *ngIf="item.data.fecha_apartado"><strong>Fecha:</strong> {{ item.data.fecha_apartado }}</p>
+        <span class="click-hint">Haz clic para ver más detalles 🔍</span>
+      </div>
+
+      <div *ngIf="limiteVisible < resultadosFiltrados.length" class="cargar-mas-container">
+        <button class="btn-cargar-mas" (click)="cargarMas()">Cargar más resultados (5 en 5)</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL DE DETALLES -->
+<div *ngIf="itemSeleccionado" class="modal-overlay" (click)="cerrarDetalle()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>
+        Detalles de la {{ itemSeleccionado.tipoElemento === 'reserva' ? 'Reserva' : 'Solicitud de Apartado' }}
+      </h3>
+      <button class="btn-close" (click)="cerrarDetalle()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-row highlight">
+        <span>Número de Folio:</span>
+        <strong>#{{ itemSeleccionado.tipoElemento === 'reserva' ? 'RES' : 'APT' }}-{{ itemSeleccionado.data.id | number:'3.0-0' }}</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Taller Artesanal:</span>
+        <strong>{{ itemSeleccionado.data.nombre_taller }}</strong>
+      </div>
+
+      <div class="detail-row">
+        <span>Estado Actual:</span>
+        <span class="badge-estado" [class.confirmada]="itemSeleccionado.data.estado?.toLowerCase() === 'confirmada'">
+          {{ itemSeleccionado.data.estado }}
+        </span>
+      </div>
+
+      <div class="detail-row">
+        <span>Fecha Registrada:</span>
+        <strong>{{ itemSeleccionado.data.fecha_visita || itemSeleccionado.data.fecha_apartado }}</strong>
+      </div>
+
+      <!-- CAMPOS ESPECÍFICOS DE RESERVA -->
+      <ng-container *ngIf="itemSeleccionado.tipoElemento === 'reserva'">
+        <div class="detail-row">
+          <span>Número de Personas:</span>
+          <strong>{{ itemSeleccionado.data.numero_personas || 1 }} persona(s)</strong>
+        </div>
+      </ng-container>
+
+      <!-- CAMPOS ESPECÍFICOS DE APARTADO -->
+      <ng-container *ngIf="itemSeleccionado.tipoElemento === 'apartado'">
+        <div class="detail-row">
+          <span>Producto Apartado:</span>
+          <strong>{{ itemSeleccionado.data.nombre_producto }}</strong>
+        </div>
+
+        <div class="detail-row">
+          <span>Cantidad / Unidades:</span>
+          <strong>{{ itemSeleccionado.data.cantidad || 1 }} pieza(s)</strong>
+        </div>
+
+        <div class="detail-row" *ngIf="itemSeleccionado.data.precio_unitario">
+          <span>Precio Unitario:</span>
+          <strong>${{ itemSeleccionado.data.precio_unitario | number:'1.2-2' }} MXN</strong>
+        </div>
+
+        <div class="detail-row total-row">
+          <span>Precio Total Estimado:</span>
+          <strong>${{ itemSeleccionado.data.precio_total | number:'1.2-2' }} MXN</strong>
+        </div>
+      </ng-container>
+
+      <div *ngIf="itemSeleccionado.data.respuesta_artesano" class="respuesta-box">
+        <label>Mensaje del Artesano:</label>
+        <p>{{ itemSeleccionado.data.respuesta_artesano }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secundario" (click)="cerrarDetalle()">Cerrar</button>
+    </div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Reserva } from '../../core/models/reserva.model';
+import { Reserva, RespuestaReserva } from '../../core/models/reserva.model';
 
 @Component({
   selector: 'app-crear-reserva',
@@ -25,26 +25,37 @@ export class CrearReserva {
     telefono_visitante: '',
     numero_personas: 1,
     fecha_reserva: '',
-    hora_reserva: '10:00' // Valor inicial sugerido para el selector de tiempo
+    hora_reserva: '10:00' // Valor inicial predeterminado
   };
+
+  
 
   exito: boolean = false;
 
   enviarReserva(): void {
-    if (!this.nuevaReserva.nombre_visitante || !this.nuevaReserva.fecha_reserva || !this.nuevaReserva.telefono_visitante) {
-      alert('Por favor completa los campos obligatorios.');
+    if (
+      !this.nuevaReserva.nombre_visitante ||
+      !this.nuevaReserva.email_visitante ||
+      !this.nuevaReserva.fecha_reserva ||
+      !this.nuevaReserva.telefono_visitante
+    ) {
+      alert('Por favor completa todos los campos obligatorios.');
       return;
     }
 
-    // Asignamos el ID del taller seleccionado en el mapa
+    // Asignamos el ID del taller seleccionado
     this.nuevaReserva.taller_id = this.tallerId;
 
-    this.http.post<any>('http://localhost:5000/api/reservas', this.nuevaReserva).subscribe({
+    this.http.post<RespuestaReserva>('http://localhost:5000/api/reservas', this.nuevaReserva).subscribe({
       next: (response) => {
         this.exito = true;
         
-        // Mostramos el folio y la notificación de éxito
-        alert(`¡Reserva realizada con éxito!\n\nNúmero de Folio: ${response.folio}\n\nHemos enviado un correo de confirmación a tu bandeja. Por favor espera a que el taller confirme o rechace tu visita.`);
+        // Notificación con folio de la reserva
+        alert(
+          `¡Reserva realizada con éxito!\n\n` +
+          `Número de Folio: ${response['folio']}\n\n` +
+          `Hemos enviado un correo de confirmación a tu bandeja. Por favor espera a que el taller confirme o rechace tu visita.`
+        );
         
         setTimeout(() => {
           this.exito = false;
@@ -53,7 +64,7 @@ export class CrearReserva {
       },
       error: (err) => {
         console.error('Error al guardar la reserva:', err);
-        alert('Ocurrió un error al enviar tu reserva. Intenta de nuevo.');
+        alert('Ocurrió un error al enviar tu reserva. Por favor intenta de nuevo.');
       }
     });
   }

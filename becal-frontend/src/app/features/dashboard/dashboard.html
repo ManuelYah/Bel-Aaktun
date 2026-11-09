@@ -262,7 +262,7 @@
               <small *ngIf="ap.email_cliente" class="text-sub">{{ ap.email_cliente }}</small>
             </td>
             <td>
-              <span class="badge" [ngClass]="ap.estado.toLowerCase()">
+              <span class="badge" [ngClass]="(ap.estado || '').toLowerCase()">
                 {{ ap.estado }}
               </span>
             </td>
@@ -275,7 +275,7 @@
                 <button 
                   class="btn-accept" 
                   (click)="abrirModalRespuesta(ap, 'Confirmar')">
-                  {{ ap.estado === 'Pendiente' ? 'Aceptar' : 'Reenviar' }}
+                  {{ (ap.estado || '').toLowerCase() === 'pendiente' ? 'Aceptar' : 'Reenviar' }}
                 </button>
 
                 <button 
@@ -317,6 +317,7 @@
             <th>Personas</th>
             <th>Fecha y Hora</th>
             <th>Estado</th>
+            <th>Respuesta Enviada</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -333,23 +334,25 @@
             <td>{{ res.numero_personas }} pers.</td>
             <td>{{ res.fecha_reserva }} a las {{ res.hora_reserva }} hrs</td>
             <td>
-              <span class="badge" [ngClass]="res.estado.toLowerCase()">
+              <span class="badge" [ngClass]="(res.estado || '').toLowerCase()">
                 {{ res.estado }}
               </span>
             </td>
             <td>
+              <small *ngIf="res.respuesta_artesano" class="respuesta-texto">"{{ res.respuesta_artesano }}"</small>
+              <small *ngIf="!res.respuesta_artesano" class="text-gray-400">Sin respuesta previa</small>
+            </td>
+            <td>
               <div class="action-buttons">
                 <button 
-                  *ngIf="res.estado !== 'ACEPTADA'" 
                   class="btn-accept" 
-                  (click)="cambiarEstadoReserva(res.id, 'ACEPTADA')">
-                  Aceptar
+                  (click)="abrirModalReserva(res, 'Confirmar')">
+                  {{ (res.estado || '').toLowerCase() === 'pendiente' ? 'Aceptar' : 'Reenviar' }}
                 </button>
                 
                 <button 
-                  *ngIf="res.estado !== 'CANCELADA'" 
                   class="btn-cancel" 
-                  (click)="cambiarEstadoReserva(res.id, 'CANCELADA')">
+                  (click)="abrirModalReserva(res, 'Cancelar')">
                   Cancelar
                 </button>
 
@@ -362,7 +365,7 @@
             </td>
           </tr>
           <tr *ngIf="reservas.length === 0">
-            <td colspan="6" class="empty-msg">No se han recibido reservas registradas por el momento.</td>
+            <td colspan="7" class="empty-msg">No se han recibido reservas registradas por el momento.</td>
           </tr>
         </tbody>
       </table>
@@ -405,6 +408,43 @@
         <button type="button" class="btn-cancelar" (click)="cerrarModalRespuesta()">Cancelar</button>
         <button type="button" class="btn-primary" (click)="enviarRespuestaYActualizar()">
           Enviar por {{ medioContacto === 'whatsapp' ? 'WhatsApp' : 'Correo' }} y Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MODAL DE RESPUESTA A SOLICITUD DE RESERVA  -->
+<!-- ========================================== -->
+<div *ngIf="mostrarModalReserva && reservaSeleccionada" class="modal-overlay">
+  <div class="modal-card modal-respuesta">
+    <div class="modal-header">
+      <h3>{{ accionReservaModal === 'Confirmar' ? 'Confirmar Visita al Taller' : 'Cancelar / Rechazar Visita' }}</h3>
+      <button type="button" class="btn-close" (click)="cerrarModalReserva()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p><strong>Visitante:</strong> {{ reservaSeleccionada.nombre_visitante }}</p>
+      <p><strong>Fecha y Hora:</strong> {{ reservaSeleccionada.fecha_reserva }} a las {{ reservaSeleccionada.hora_reserva }} hrs ({{ reservaSeleccionada.numero_personas }} personas)</p>
+
+      <div class="form-group full-width my-3">
+        <label>Canal para notificar al visitante:</label>
+        <select [(ngModel)]="medioContactoReserva" class="input-select">
+          <option value="whatsapp">💬 WhatsApp ({{ reservaSeleccionada.telefono_visitante }})</option>
+          <option value="email" *ngIf="reservaSeleccionada.email_visitante">✉️ Correo Electrónico ({{ reservaSeleccionada.email_visitante }})</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width my-3">
+        <label>Mensaje para el visitante (puedes adaptarlo antes de enviar):</label>
+        <textarea [(ngModel)]="mensajeReservaArtesano" rows="5" class="input-textarea"></textarea>
+      </div>
+
+      <div class="modal-actions-right flex justify-end gap-2 mt-4">
+        <button type="button" class="btn-cancelar" (click)="cerrarModalReserva()">Cancelar</button>
+        <button type="button" class="btn-primary" (click)="enviarRespuestaReservaYActualizar()">
+          Enviar por {{ medioContactoReserva === 'whatsapp' ? 'WhatsApp' : 'Correo' }} y Guardar
         </button>
       </div>
     </div>

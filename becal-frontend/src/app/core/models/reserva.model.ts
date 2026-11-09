@@ -20,3 +20,10 @@ export interface SesionArtesano {
   nombre_taller: string;
   token?: string;
 }
+
+export interface RespuestaReserva {
+  message?: string;
+  id?: number;
+  status?: string;
+  [key: string]: any;
+}
