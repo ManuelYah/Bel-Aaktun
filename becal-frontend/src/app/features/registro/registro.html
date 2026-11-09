@@ -1,0 +1,29 @@
+<div class="registro-container" style="max-width: 400px; margin: 40px auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff;">
+  <h2 style="color: #c85a32; text-align: center;">Registro de Nuevo Usuario</h2>
+  
+  <form (ngSubmit)="registrarNuevoUsuario()">
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre Completo:</label>
+      <input type="text" [(ngModel)]="nuevoUsuario.nombre" name="nombre" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px; font-weight: bold;">Correo Electrónico:</label>
+      <input type="email" [(ngModel)]="nuevoUsuario.email" name="email" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px; font-weight: bold;">Contraseña:</label>
+      <input type="password" [(ngModel)]="nuevoUsuario.password" name="password" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; margin-bottom: 5px; font-weight: bold;">ID de Taller (Opcional):</label>
+      <input type="number" [(ngModel)]="nuevoUsuario.taller_id" name="taller_id" placeholder="Ej. 7 para Lool Jipi" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <button type="submit" style="width: 100%; background-color: #c85a32; color: white; padding: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+      Registrarse
+    </button>
+  </form>
+</div>

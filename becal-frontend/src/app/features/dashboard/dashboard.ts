@@ -13,6 +13,7 @@ interface Reserva {
   fecha_reserva: string;
   hora_reserva: string;
   estado: string;
+  respuesta_artesano?: string;
 }
 
 interface Apartado {
@@ -51,6 +52,44 @@ interface Producto {
 export class Dashboard implements OnInit {
   tallerId: number = 0;
   nombreTallerSesion: string = '';
+
+  // Navegación reactiva entre las tres secciones del dashboard
+  seccionActiva: 'productos' | 'apartados' | 'reservas' = 'productos';
+
+  // Control del sidebar en dispositivos móviles
+  menuAbierto: boolean = false;
+
+  // Contador de solicitudes de apartado pendientes
+  get apartadosPendientes(): number {
+    return this.apartados.filter(ap =>
+      (ap.estado || '').toLowerCase() === 'pendiente'
+    ).length;
+  }
+
+  // Contador de reservas pendientes
+  get reservasPendientes(): number {
+    return this.reservas.filter(res =>
+      (res.estado || '').toLowerCase() === 'pendiente'
+    ).length;
+  }
+
+  // Cambia la sección visible sin recargar la página
+  cambiarSeccion(
+    seccion: 'productos' | 'apartados' | 'reservas'
+  ): void {
+    this.seccionActiva = seccion;
+    this.menuAbierto = false;
+  }
+
+  // Abre o cierra el menú lateral móvil
+  alternarMenu(): void {
+    this.menuAbierto = !this.menuAbierto;
+  }
+
+  // Cierra el menú lateral
+  cerrarMenu(): void {
+    this.menuAbierto = false;
+  }
   
   reservas: Reserva[] = [];
   apartados: Apartado[] = [];
@@ -65,6 +104,13 @@ export class Dashboard implements OnInit {
   accionModal: 'Confirmar' | 'Cancelar' = 'Confirmar';
   mensajeArtesano: string = '';
   medioContacto: 'whatsapp' | 'email' = 'whatsapp';
+
+  // Modal para responder reserva
+  reservaSeleccionada: Reserva | null = null;
+  mostrarModalReserva: boolean = false;
+  accionReservaModal: 'Confirmar' | 'Cancelar' = 'Confirmar';
+  mensajeReservaArtesano: string = '';
+  medioContactoReserva: 'whatsapp' | 'email' = 'whatsapp';
 
   nuevoProducto: Producto = {
     nombre_pieza: '',
@@ -141,9 +187,9 @@ export class Dashboard implements OnInit {
     this.mostrarModalRespuesta = true;
 
     if (accion === 'Confirmar') {
-      this.mensajeArtesano = `¡Hola ${apartado.nombre_cliente}! Te confirmo que recibimos tu pedido de (${apartado.cantidad}) pieza(s) de "${apartado.nombre_pieza || 'Artesanía'}". Estará listo para recoger el día X. El pago se realiza directamente en el taller en efectivo o transferencia.`;
+      this.mensajeArtesano = `¡Hola ${apartado.nombre_cliente}! Te confirmo que recibimos tu pedido de (${apartado.cantidad}) pieza(s) de "${apartado.nombre_pieza || 'Artesanía'}". Estará listo para recoger en el taller. El pago se realiza directamente al recoger en efectivo o transferencia.`;
     } else {
-      this.mensajeArtesano = `Hola ${apartado.nombre_cliente}, respecto a tu apartado de "${apartado.nombre_pieza || 'Artesanía'}", lamentablemente no tenemos stock disponible en este momento / está en proceso de fabricación. Te notificaremos cuando tengamos disponibles.`;
+      this.mensajeArtesano = `Hola ${apartado.nombre_cliente}, respecto a tu apartado de "${apartado.nombre_pieza || 'Artesanía'}", lamentablemente no tenemos stock disponible en este momento. Te notificaremos cuando tengamos más piezas.`;
     }
     this.cdr.detectChanges();
   }
@@ -163,10 +209,8 @@ export class Dashboard implements OnInit {
       respuesta_artesano: this.mensajeArtesano
     };
 
-    // 1. Guardar estado y respuesta en backend
     this.http.patch(`${this.baseUrl}/apartados/${this.apartadoSeleccionado.id}`, payload).subscribe({
       next: () => {
-        // 2. Abrir WhatsApp o Cliente de Correo
         if (this.medioContacto === 'whatsapp' && this.apartadoSeleccionado?.telefono_cliente) {
           const mensajeEncoded = encodeURIComponent(this.mensajeArtesano);
           const url = `https://wa.me/${this.apartadoSeleccionado.telefono_cliente}?text=${mensajeEncoded}`;
@@ -178,7 +222,7 @@ export class Dashboard implements OnInit {
           window.location.href = mailtoUrl;
         }
 
-        alert('Apartado marcado como ' + nuevoEstado + ' y mensaje preparado para envío.');
+        alert('Apartado marcado como ' + nuevoEstado + ' y mensaje preparado.');
         this.cerrarModalRespuesta();
         this.cargarApartados();
       },
@@ -191,6 +235,69 @@ export class Dashboard implements OnInit {
       this.http.delete(`${this.baseUrl}/apartados/${apartadoId}`).subscribe({
         next: () => this.cargarApartados(),
         error: (err) => console.error('Error eliminando apartado:', err)
+      });
+    }
+  }
+
+  // --- LÓGICA DE GESTIÓN DE RESERVAS ---
+
+  abrirModalReserva(reserva: Reserva, accion: 'Confirmar' | 'Cancelar'): void {
+    this.reservaSeleccionada = reserva;
+    this.accionReservaModal = accion;
+    this.mostrarModalReserva = true;
+
+    const fechaFormateada = reserva.fecha_reserva || 'la fecha indicada';
+    const horaFormateada = reserva.hora_reserva || '';
+
+    if (accion === 'Confirmar') {
+      this.mensajeReservaArtesano = `¡Hola ${reserva.nombre_visitante}! Te confirmo que tu visita al taller "${this.nombreTallerSesion}" para el día ${fechaFormateada} a las ${horaFormateada} hrs (${reserva.numero_personas} persona(s)) ha sido ACEPTADA. ¡Te esperamos!`;
+    } else {
+      this.mensajeReservaArtesano = `Hola ${reserva.nombre_visitante}, respecto a tu solicitud de visita al taller "${this.nombreTallerSesion}" para el día ${fechaFormateada}, lamentablemente no nos será posible recibirles en ese horario.`;
+    }
+    this.cdr.detectChanges();
+  }
+
+  cerrarModalReserva(): void {
+    this.mostrarModalReserva = false;
+    this.reservaSeleccionada = null;
+    this.mensajeReservaArtesano = '';
+  }
+
+  enviarRespuestaReservaYActualizar(): void {
+    if (!this.reservaSeleccionada) return;
+
+    const nuevoEstado = this.accionReservaModal === 'Confirmar' ? 'Confirmada' : 'Cancelada';
+    const payload = {
+      estado: nuevoEstado,
+      respuesta_artesano: this.mensajeReservaArtesano // <-- ¡Faltaba esta línea en el payload!
+    };
+
+    this.http.patch(`${this.baseUrl}/reservas/${this.reservaSeleccionada.id}`, payload).subscribe({
+      next: () => {
+        if (this.medioContactoReserva === 'whatsapp' && this.reservaSeleccionada?.telefono_visitante) {
+          const mensajeEncoded = encodeURIComponent(this.mensajeReservaArtesano);
+          const url = `https://wa.me/${this.reservaSeleccionada.telefono_visitante}?text=${mensajeEncoded}`;
+          window.open(url, '_blank');
+        } else if (this.medioContactoReserva === 'email' && this.reservaSeleccionada?.email_visitante) {
+          const asunto = encodeURIComponent(`Estado de tu reserva de visita - ${this.nombreTallerSesion}`);
+          const cuerpo = encodeURIComponent(this.mensajeReservaArtesano);
+          const mailtoUrl = `mailto:${this.reservaSeleccionada.email_visitante}?subject=${asunto}&body=${cuerpo}`;
+          window.location.href = mailtoUrl;
+        }
+
+        alert('Reserva marcada como ' + nuevoEstado + ' y mensaje preparado.');
+        this.cerrarModalReserva();
+        this.cargarReservas();
+      },
+      error: (err) => console.error('Error al actualizar estado de reserva:', err)
+    });
+  }
+
+  eliminarReserva(reservaId: number): void {
+    if (confirm('¿Estás seguro de eliminar esta reserva?')) {
+      this.http.delete(`${this.baseUrl}/reservas/${reservaId}`).subscribe({
+        next: () => this.cargarReservas(),
+        error: (err) => console.error('Error eliminando reserva:', err)
       });
     }
   }
@@ -254,7 +361,8 @@ export class Dashboard implements OnInit {
       imagen_url: prod.imagen_url || '',
       imagenes: imgs
     };
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    this.seccionActiva = 'productos';
+    this.menuAbierto = false;
   }
 
   cancelarEdicion(): void {
@@ -276,22 +384,6 @@ export class Dashboard implements OnInit {
       this.http.delete(`${this.baseUrl}/productos/${productoId}`).subscribe({
         next: () => this.cargarProductos(),
         error: (err) => console.error('Error eliminando producto:', err)
-      });
-    }
-  }
-
-  cambiarEstadoReserva(reservaId: number, estado: string): void {
-    this.http.patch(`${this.baseUrl}/reservas/${reservaId}`, { estado }).subscribe({
-      next: () => this.cargarReservas(),
-      error: (err) => console.error('Error actualizando estado de reserva:', err)
-    });
-  }
-
-  eliminarReserva(reservaId: number): void {
-    if (confirm('¿Estás seguro de eliminar esta reserva?')) {
-      this.http.delete(`${this.baseUrl}/reservas/${reservaId}`).subscribe({
-        next: () => this.cargarReservas(),
-        error: (err) => console.error('Error eliminando reserva:', err)
       });
     }
   }

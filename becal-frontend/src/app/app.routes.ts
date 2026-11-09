@@ -7,6 +7,8 @@ import { CrearReserva } from './features/reserva/reserva'; // Componente para cr
 import { authGuard } from './core/guards/auth-guard'; // Guard para proteger rutas
 import { Dashboard } from './features/dashboard/dashboard'; // Componente del dashboard
 import { Login } from './features/auth/login/login'; // Componente de login
+import { Registro } from './features/registro/registro'; // Componente de registro
+import { Seguimiento } from './features/seguimiento/seguimiento'; // Componente de seguimiento
 
 export const routes: Routes = [
   { path: '', component: Home }, // Muestra Home al entrar a localhost:4200
@@ -16,5 +18,8 @@ export const routes: Routes = [
   { path: 'contacto', component: Contacto }, // Muestra el formulario de contacto
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard] }, // Muestra el dashboard solo si el usuario está autenticado
   { path: 'login', component: Login }, // Muestra el formulario de login 
-  { path: '**', redirectTo: '' }         
+  { path: 'registro', component: Registro }, // Muestra el formulario de registro
+  { path: 'seguimiento', component: Seguimiento }, // Muestra el componente de seguimiento
+  { path: '**', redirectTo: '' }          
+  
 ];
