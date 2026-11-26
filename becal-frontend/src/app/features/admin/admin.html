@@ -1,0 +1,218 @@
+<section class="admin">
+  <header class="admin-encabezado">
+    <div>
+      <h1>Panel de administración</h1>
+      <p class="admin-saludo">Sesión de {{ usuario()?.nombre }}</p>
+    </div>
+    <button type="button" class="btn-texto" data-testid="admin-logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  </header>
+
+  @if (aviso()) {
+    <div class="banner banner-ok" role="status">{{ aviso() }}</div>
+  }
+  @if (error()) {
+    <div class="banner banner-error" role="alert">
+      {{ error() }}
+      <button type="button" class="btn-texto" (click)="recargarTodo()">Reintentar</button>
+    </div>
+  }
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" class="pestana" data-testid="tab-resenas" [class.activa]="pestana() === 'resenas'"
+      [attr.aria-selected]="pestana() === 'resenas'" (click)="pestana.set('resenas')">
+      Reseñas
+      @if (resumen().comentarios_pendientes > 0) {
+        <span class="contador" aria-label="pendientes">{{ resumen().comentarios_pendientes }}</span>
+      }
+    </button>
+    <button type="button" role="tab" class="pestana" data-testid="tab-mensajes" [class.activa]="pestana() === 'mensajes'"
+      [attr.aria-selected]="pestana() === 'mensajes'" (click)="pestana.set('mensajes')">
+      Mensajes de contacto
+      @if (resumen().mensajes_nuevos > 0) {
+        <span class="contador" aria-label="nuevos">{{ resumen().mensajes_nuevos }}</span>
+      }
+    </button>
+    <button type="button" role="tab" class="pestana" data-testid="tab-productos" [class.activa]="pestana() === 'productos'"
+      [attr.aria-selected]="pestana() === 'productos'" (click)="pestana.set('productos')">
+      Productos
+    </button>
+  </div>
+
+  <!-- ===================== RESEÑAS ===================== -->
+  @if (pestana() === 'resenas') {
+    <div class="filtros" role="group" aria-label="Filtrar reseñas">
+      @for (f of filtrosResenas; track f.valor) {
+        <button type="button" class="filtro" [class.activo]="filtroResenas() === f.valor"
+          [attr.aria-pressed]="filtroResenas() === f.valor" (click)="cambiarFiltroResenas(f.valor)">
+          {{ f.etiqueta }}
+        </button>
+      }
+    </div>
+
+    @if (cargando()) {
+      <p class="vacio">Cargando reseñas...</p>
+    } @else if (resenas().length === 0) {
+      <p class="vacio">{{ textoVacioResenas() }}</p>
+    } @else {
+      <div class="lista">
+        @for (r of resenas(); track r.id) {
+          <article class="item" data-testid="resena-item" [class.es-pendiente]="r.estado === 'PENDIENTE'"
+            [class.es-aprobada]="r.estado === 'APROBADO'" [class.es-rechazada]="r.estado === 'RECHAZADO'">
+            <div class="item-cabecera">
+              <h2>{{ r.titulo }}</h2>
+              <span class="estado estado-{{ r.estado.toLowerCase() }}">{{ etiquetaEstado(r.estado) }}</span>
+            </div>
+
+            <p class="meta">
+              <span class="estrellas" [attr.aria-label]="r.calificacion + ' de 5 estrellas'">{{ estrellas(r.calificacion) }}</span>
+              {{ r.nombre_taller || 'Taller sin nombre' }}
+            </p>
+            <p class="meta">{{ r.autor_nombre }}, {{ r.contacto }} (folio {{ r.folio }}), {{ fecha(r.created_at) }}</p>
+
+            <p class="texto">{{ r.descripcion }}</p>
+
+            @if (r.fotos.length > 0) {
+              <ul class="fotos">
+                @for (foto of r.fotos; track foto) {
+                  <li>
+                    <button type="button" class="foto" (click)="ampliarFoto(foto)" aria-label="Ampliar foto">
+                      <img [src]="foto" alt="Foto adjunta a la reseña" loading="lazy" />
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (r.estado === 'RECHAZADO' && r.motivo_rechazo) {
+              <p class="motivo">Motivo del rechazo: {{ r.motivo_rechazo }}</p>
+            }
+
+            @if (rechazandoId() === r.id) {
+              <div class="rechazo">
+                <label [for]="'motivo-' + r.id">Motivo del rechazo (opcional)</label>
+                <textarea [id]="'motivo-' + r.id" rows="2" maxlength="255" [value]="motivo()"
+                  (input)="escribirMotivo($event)" placeholder="Por ejemplo: contiene lenguaje ofensivo"></textarea>
+                <div class="acciones">
+                  <button type="button" class="btn btn-peligro" [disabled]="trabajandoId() === r.id" (click)="confirmarRechazo(r)">Rechazar reseña</button>
+                  <button type="button" class="btn-texto" (click)="cancelarRechazo()">Cancelar</button>
+                </div>
+              </div>
+            } @else {
+              <div class="acciones">
+                @if (r.estado !== 'APROBADO') {
+                  <button type="button" class="btn btn-aprobar" data-testid="resena-aprobar" [disabled]="trabajandoId() === r.id" (click)="aprobar(r)">Aprobar y publicar</button>
+                }
+                @if (r.estado !== 'RECHAZADO') {
+                  <button type="button" class="btn btn-contorno" [disabled]="trabajandoId() === r.id" (click)="abrirRechazo(r)">Rechazar</button>
+                }
+                @if (r.estado !== 'PENDIENTE') {
+                  <button type="button" class="btn-texto" [disabled]="trabajandoId() === r.id" (click)="regresarAPendiente(r)">Regresar a pendientes</button>
+                }
+                @if (confirmandoId() === 'r' + r.id) {
+                  <span class="confirmar">¿Eliminar definitivamente?</span>
+                  <button type="button" class="btn btn-peligro" data-testid="confirmar-eliminar" [disabled]="trabajandoId() === r.id" (click)="eliminarResena(r)">Sí, eliminar</button>
+                  <button type="button" class="btn-texto" (click)="cancelarConfirmacion()">Cancelar</button>
+                } @else {
+                  <button type="button" class="btn-texto btn-eliminar" (click)="pedirConfirmacion('r' + r.id)">Eliminar</button>
+                }
+              </div>
+            }
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <!-- ===================== MENSAJES ===================== -->
+  @if (pestana() === 'mensajes') {
+    <div class="filtros" role="group" aria-label="Filtrar mensajes">
+      @for (f of filtrosMensajes; track f.valor) {
+        <button type="button" class="filtro" [class.activo]="filtroMensajes() === f.valor"
+          [attr.aria-pressed]="filtroMensajes() === f.valor" (click)="cambiarFiltroMensajes(f.valor)">
+          {{ f.etiqueta }}
+        </button>
+      }
+    </div>
+
+    @if (mensajes().length === 0) {
+      <p class="vacio">No hay mensajes en esta bandeja. Los que lleguen desde la página de contacto aparecerán aquí.</p>
+    } @else {
+      <div class="lista">
+        @for (m of mensajes(); track m.id) {
+          <article class="item" data-testid="mensaje-item" [class.es-pendiente]="m.estado === 'NUEVO'">
+            <div class="item-cabecera">
+              <h2>{{ m.nombre }}</h2>
+              @if (m.estado === 'NUEVO') {
+                <span class="estado estado-pendiente">Nuevo</span>
+              } @else if (m.estado === 'ARCHIVADO') {
+                <span class="estado estado-rechazado">Archivado</span>
+              }
+            </div>
+            <p class="meta">{{ fecha(m.created_at) }}</p>
+            <p class="meta">
+              @if (m.email) { <a [href]="enlaceCorreo(m)">{{ m.email }}</a> }
+              @if (m.telefono) { <a [href]="enlaceWhatsApp(m)" target="_blank" rel="noopener">{{ m.telefono }} (WhatsApp)</a> }
+            </p>
+            <p class="texto">{{ m.mensaje }}</p>
+
+            <div class="acciones">
+              @if (m.estado === 'NUEVO') {
+                <button type="button" class="btn btn-aprobar" [disabled]="trabajandoId() === m.id" (click)="marcarMensaje(m, 'LEIDO', 'Mensaje marcado como leído.')">Marcar como leído</button>
+              } @else {
+                <button type="button" class="btn btn-contorno" [disabled]="trabajandoId() === m.id" (click)="marcarMensaje(m, 'NUEVO', 'El mensaje volvió a nuevos.')">Marcar como nuevo</button>
+              }
+              @if (m.estado !== 'ARCHIVADO') {
+                <button type="button" class="btn-texto" [disabled]="trabajandoId() === m.id" (click)="marcarMensaje(m, 'ARCHIVADO', 'Mensaje archivado.')">Archivar</button>
+              }
+              @if (confirmandoId() === 'm' + m.id) {
+                <span class="confirmar">¿Eliminar definitivamente?</span>
+                <button type="button" class="btn btn-peligro" data-testid="confirmar-eliminar" [disabled]="trabajandoId() === m.id" (click)="eliminarMensaje(m)">Sí, eliminar</button>
+                <button type="button" class="btn-texto" (click)="cancelarConfirmacion()">Cancelar</button>
+              } @else {
+                <button type="button" class="btn-texto btn-eliminar" (click)="pedirConfirmacion('m' + m.id)">Eliminar</button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <!-- ===================== PRODUCTOS ===================== -->
+  @if (pestana() === 'productos') {
+    @if (productos().length === 0) {
+      <p class="vacio">No hay productos en el catálogo.</p>
+    } @else {
+      <div class="lista">
+        @for (p of productos(); track p.id) {
+          <article class="item" data-testid="producto-item">
+            <div class="item-cabecera">
+              <h2>{{ p.nombre_pieza || 'Pieza sin nombre' }}</h2>
+              <span class="estado estado-aprobado">{{ p.nombre_taller || 'Sin taller' }}</span>
+            </div>
+            <p class="meta">
+              @if (p.precio !== null && p.precio !== '') { Precio: $ {{ p.precio }} }
+              @if (p.calidad) { · Calidad: {{ p.calidad }} }
+            </p>
+            <div class="acciones">
+              @if (confirmandoId() === 'p' + p.id) {
+                <span class="confirmar">¿Eliminar del catálogo?</span>
+                <button type="button" class="btn btn-peligro" data-testid="confirmar-eliminar" [disabled]="trabajandoId() === p.id" (click)="eliminarProducto(p)">Sí, eliminar</button>
+                <button type="button" class="btn-texto" (click)="cancelarConfirmacion()">Cancelar</button>
+              } @else {
+                <button type="button" class="btn-texto btn-eliminar" data-testid="producto-eliminar" (click)="pedirConfirmacion('p' + p.id)">Eliminar producto</button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  @if (fotoAmpliada()) {
+    <div class="visor" role="dialog" aria-modal="true" aria-label="Foto ampliada" (click)="cerrarFoto()" (keydown.escape)="cerrarFoto()" tabindex="-1">
+      <img [src]="fotoAmpliada()" alt="Foto ampliada de la reseña" />
+      <button type="button" class="btn-texto visor-cerrar" (click)="cerrarFoto()">Cerrar</button>
+    </div>
+  }
+</section>

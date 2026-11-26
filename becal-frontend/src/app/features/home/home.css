@@ -1,0 +1,267 @@
+/* --- HERO SECTION CENTRADO CON FUENTES MÁS GRANDES (+3) --- */
+.hero-section {
+  position: relative;
+  min-height: 90vh;
+  background: linear-gradient(rgba(20, 12, 9, 0.72), rgba(20, 12, 9, 0.85)),
+              url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR8FJxA5UiqcQwAdlYCsxXzH9lshVP7d5ZRJ93C1qWKpRvqNFqTbcfWiAak&s=10') center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 1.5rem;
+  color: #ffffff;
+}
+
+.hero-overlay {
+  max-width: 900px; /* Aumentado ligeramente para dar espacio al texto más grande */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Recuadro de ubicación (aumentado de 0.8rem a 1.1rem) */
+.location-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(226, 120, 78, 0.4);
+  background-color: rgba(60, 25, 15, 0.5);
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: #e28766;
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+}
+
+.location-icon {
+  font-size: 1rem;
+  color: #c45b35;
+}
+
+/* Título principal (aumentado de 3.5rem a 4.25rem) */
+.hero-section h1 {
+  font-family: var(--font-heading);
+  font-size: 4.25rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #f7f4ee;
+  margin-bottom: 1rem;
+}
+
+/* Texto en color terracota/naranja */
+.highlight-text {
+  color: #d9633b;
+}
+
+/* Frase en idioma Maya (aumentado de 1.15rem a 1.45rem) */
+.maya-translation {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 1.45rem;
+  color: #d8beaa;
+  margin-bottom: 1.5rem;
+}
+
+/* Texto descriptivo (aumentado de 1.15rem a 1.45rem) */
+.hero-desc {
+  font-family: var(--font-body);
+  font-size: 1.45rem;
+  color: #d4cecb;
+  line-height: 1.6;
+  margin-bottom: 2.8rem;
+  max-width: 750px;
+}
+
+/* Botones centrados (fuente aumentada de 1.05rem a 1.35rem) */
+.hero-actions {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background-color: #d9633b;
+  color: #ffffff;
+  padding: 1.1rem 2.2rem;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #be4e28;
+}
+
+.btn-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  padding: 1.1rem 2.2rem;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 1.35rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Indicador inferior EXPLORAR (aumentado de 0.75rem a 1.05rem) */
+.scroll-indicator {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #a0958e;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  letter-spacing: 2px;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 30px;
+  background-color: #d9633b;
+}
+
+/* --- SECCIÓN NUESTRA TRADICIÓN (FONDO ARENA) --- */
+.tradicion-section {
+  background-color: #f7f3e9; /* Tono arena / crema idéntico al diseño */
+  padding: 6rem 2rem 4rem 2rem;
+  color: #2c1a12;
+  border-bottom: 1px solid #e2dacd;
+}
+
+.tradicion-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: left;
+  margin-bottom: 4rem;
+}
+
+.section-tag {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #c45b35;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.8rem;
+}
+
+.section-header h2 {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #221510;
+  margin: 0 0 1.2rem 0;
+}
+
+.section-desc {
+  font-family: var(--font-body);
+  font-size: 1.3rem;
+  color: #5a4a42;
+  max-width: 750px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* REJILLA DE 5 COLUMNAS */
+.procesos-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 5rem;
+}
+
+/* Responsivo para pantallas medianas o pequeñas */
+@media (max-width: 1100px) {
+  .procesos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.proceso-card {
+  border-left: 1px solid #dcd3c5;
+  padding: 1.5rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease;
+}
+
+/* Destacado sutil en la segunda tarjeta o al hacer hover */
+.proceso-card.highlight-card, .proceso-card:hover {
+  background-color: rgba(226, 120, 78, 0.05);
+  border-left: 2px solid #c45b35;
+}
+
+.proceso-num {
+  font-family: var(--font-heading);
+  font-size: 3.8rem;
+  font-weight: 700;
+  color: #e5d8c5;
+  line-height: 1;
+  margin-bottom: 0.8rem;
+}
+
+.proceso-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.proceso-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #221510;
+  margin: 0 0 0.3rem 0;
+}
+
+.maya-sub {
+  font-family: var(--font-heading);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: #c45b35;
+  margin: 0 0 1rem 0;
+}
+
+.proceso-desc {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: #55453d;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* PIE DE SECCIÓN */
+.tradicion-footer {
+  text-align: center;
+  border-top: 1px solid #e0d5c5;
+  padding-top: 2rem;
+}
+
+.tradicion-footer span {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  color: #938275;
+}

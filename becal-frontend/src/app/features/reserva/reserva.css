@@ -1,0 +1,49 @@
+/* Modal de Reserva */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 2000;
+}
+.modal-card {
+  background: white; border-radius: 8px; width: 90%; max-width: 500px;
+  padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; }
+
+/* Formulario */
+.form-group { margin-bottom: 12px; flex: 1; }
+.form-row { display: flex; gap: 12px; }
+.form-group label { display: block; font-size: 0.85rem; margin-bottom: 4px; font-weight: bold; }
+.form-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.btn-primary { background: #2e5339; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+.btn-secondary { background: #6c757d; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; }
+
+/* Panel Artesano */
+.panel-container { padding: 24px; max-width: 1100px; margin: 0 auto; font-family: sans-serif; }
+.panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.filters-bar { display: flex; gap: 8px; margin-bottom: 16px; }
+.filters-bar button { padding: 6px 14px; border: 1px solid #ccc; background: white; border-radius: 20px; cursor: pointer; }
+.filters-bar button.active { background: #2e5339; color: white; border-color: #2e5339; }
+
+/* Tabla */
+.table-card { background: white; border-radius: 8px; border: 1px solid #e0e0e0; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: 12px 16px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+th { background: #f8f9fa; }
+
+/* Badges */
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+.badge.pendiente { background: #fff3cd; color: #856404; }
+.badge.confirmada { background: #d4edda; color: #155724; }
+.badge.cancelada { background: #f8d7da; color: #721c24; }
+
+/* Botones Acción */
+.actions-cell { display: flex; gap: 4px; }
+.btn-btn-success { background: #28a745; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+.btn-btn-danger { background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+.btn-btn-whatsapp { background: #25d366; color: white; text-decoration: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
