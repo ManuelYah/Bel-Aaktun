@@ -137,3 +137,18 @@
 .btn-reservar:hover {
   background-color: #b04e2d !important;
 }
+
+.btn-nav-estatus {
+  padding: 8px 16px;
+  background-color: #c85a32;
+  color: #ffffff !important;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-nav-estatus:hover {
+  background-color: #b04e2a;
+}

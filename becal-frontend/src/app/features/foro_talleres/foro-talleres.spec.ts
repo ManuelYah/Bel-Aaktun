@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminArtesano } from './artesano';
+import { AdminArtesano } from './admin-artesano';
 
 describe('AdminArtesano', () => {
   let component: AdminArtesano;
@@ -15,7 +15,7 @@ describe('AdminArtesano', () => {
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
-  
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });

@@ -180,3 +180,53 @@
 .btn-reserva-card:hover {
   background-color: #213d29;
 }
+
+.cuevas-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cuevas-header-texto {
+  max-width: 720px;
+}
+
+.btn-foro-general {
+  background-color: #fff8f1;
+  color: #9a3412;
+  border: 1.5px solid #c2410c;
+  border-radius: 8px;
+  padding: 0.65rem 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-foro-general:hover {
+  background-color: #c2410c;
+  color: #ffffff;
+}
+
+.acciones-cueva {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.btn-foro-card {
+  background-color: #fdf6ee;
+  color: #7c2d12;
+  border: 1px solid #d6b89c;
+  border-radius: 7px;
+  padding: 0.55rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-foro-card:hover {
+  background-color: #f5e6d3;
+}

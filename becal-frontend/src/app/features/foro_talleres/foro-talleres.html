@@ -1,0 +1,219 @@
+<section class="foro-wrapper">
+  <div class="foro-header">
+    <div>
+      <h2>Foro de Experiencias y Reseñas de Talleres</h2>
+      <p class="subtitulo">
+        Haz clic en cualquier reseña para ver los detalles y fotografías compartidas.
+      </p>
+    </div>
+
+    <div class="acciones-principales">
+      <button type="button" class="btn-primario" (click)="abrirFormulario('crear')">
+        + Dejar comentario
+      </button>
+      <button type="button" class="btn-secundario" (click)="abrirFormulario('editar')">
+        Editar comentario
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="mensajeExito" class="alerta exito">{{ mensajeExito }}</div>
+  <div *ngIf="mensajeError && !mostrarFormulario" class="alerta error">{{ mensajeError }}</div>
+
+  <!-- Formulario para crear o editar -->
+  <div *ngIf="mostrarFormulario" class="card-formulario">
+    <div class="form-top">
+      <h3>
+        {{ modo === 'crear' ? 'Publicar comentario de visita o apartado' : 'Editar comentario existente' }}
+      </h3>
+      <button type="button" class="btn-cerrar" (click)="cerrarFormulario()">✕</button>
+    </div>
+
+    <div *ngIf="mensajeError" class="alerta error">{{ mensajeError }}</div>
+
+    <form (ngSubmit)="guardarComentario()" #formRef="ngForm" class="grid-form">
+      <div class="campo">
+        <label for="folio">Número de folio *</label>
+        <input
+          id="folio"
+          name="folio"
+          type="text"
+          [(ngModel)]="folio"
+          placeholder="Ej. RES-7 o APT-3"
+          required
+        />
+      </div>
+
+      <div class="campo" *ngIf="modo === 'crear'">
+        <label for="nombre">Nombre completo *</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          [(ngModel)]="nombre"
+          placeholder="Tal como aparece en tu reserva o apartado"
+          required
+        />
+      </div>
+
+      <div class="campo">
+        <label for="contacto">Correo o teléfono ligado al folio *</label>
+        <input
+          id="contacto"
+          name="contacto"
+          type="text"
+          [(ngModel)]="contacto"
+          placeholder="correo@ejemplo.com o celular"
+          required
+        />
+      </div>
+
+      <div class="campo">
+        <label>Calificación (1 a 5 estrellas) *</label>
+        <div class="estrellas-selector">
+          <button
+            type="button"
+            *ngFor="let estrella of [1, 2, 3, 4, 5]"
+            class="estrella-btn"
+            [class.activa]="estrella <= calificacion"
+            (click)="seleccionarCalificacion(estrella)"
+          >
+            ★
+          </button>
+          <span class="puntaje-texto">{{ calificacion }} / 5</span>
+        </div>
+      </div>
+
+      <div class="campo full-ancho">
+        <label for="titulo">Título del comentario *</label>
+        <input
+          id="titulo"
+          name="titulo"
+          type="text"
+          maxlength="140"
+          [(ngModel)]="titulo"
+          placeholder="Resumen breve de tu experiencia"
+          required
+        />
+      </div>
+
+      <div class="campo full-ancho">
+        <label for="descripcion">Descripción *</label>
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          rows="4"
+          [(ngModel)]="descripcion"
+          placeholder="Cuéntanos sobre la atención, el taller o el producto..."
+          required
+        ></textarea>
+      </div>
+
+      <div class="campo full-ancho">
+        <label for="fotos">Fotografías (máximo 3)</label>
+        <input
+          #inputFotos
+          id="fotos"
+          name="fotos"
+          type="file"
+          accept="image/*"
+          multiple
+          (change)="onArchivosSeleccionados($event)"
+        />
+        <small class="ayuda">
+          {{ modo === 'editar' ? 'Si subes nuevas fotos (hasta 3), reemplazarán las actuales.' : 'Puedes adjuntar hasta 3 imágenes.' }}
+        </small>
+
+        <!-- Lista de fotos seleccionadas con botón X para eliminar cada una -->
+        <ul class="lista-archivos" *ngIf="archivosSeleccionados.length > 0">
+          <li *ngFor="let archivo of archivosSeleccionados; let i = index" class="archivo-chip">
+            <img
+              *ngIf="previsualizaciones[i]"
+              [src]="previsualizaciones[i]"
+              alt="Vista previa {{ i + 1 }}"
+              class="mini-thumb"
+            />
+            <span class="archivo-nombre">{{ archivo.name }}</span>
+            <button
+              type="button"
+              class="btn-quitar-archivo"
+              title="Eliminar foto"
+              (click)="quitarFoto(i, inputFotos)"
+            >
+              ✕
+            </button>
+          </li>
+        </ul>
+      </div>
+
+      <div class="form-acciones full-ancho">
+        <button type="button" class="btn-secundario" (click)="cerrarFormulario()" [disabled]="enviando">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primario" [disabled]="formRef.invalid || enviando">
+          {{ enviando ? 'Guardando...' : (modo === 'crear' ? 'Publicar comentario' : 'Guardar cambios') }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Filtro por taller -->
+  <div class="barra-filtro">
+    <label for="filtroTaller">Filtrar por taller:</label>
+    <select
+      id="filtroTaller"
+      [(ngModel)]="filtroTallerId"
+      (change)="cargarComentarios()"
+    >
+      <option [ngValue]="null">Todos los talleres</option>
+      <option *ngFor="let t of talleres" [ngValue]="t.id">{{ t.nombre }}</option>
+    </select>
+  </div>
+
+  <!-- Listado del foro -->
+  <div *ngIf="cargandoLista" class="estado-vacio">Cargando comentarios...</div>
+
+  <div *ngIf="!cargandoLista && comentarios.length === 0" class="estado-vacio">
+    Aún no hay comentarios publicados para este filtro.
+  </div>
+
+  <div class="lista-comentarios" *ngIf="!cargandoLista && comentarios.length > 0">
+    <article
+      class="comentario-card"
+      *ngFor="let item of comentarios"
+      [class.expandida]="expandidoId === item.id"
+    >
+      <!-- Cabecera visible: Taller + Estrellas + Título (sin folio) -->
+      <div class="comentario-resumen" (click)="alternarTarjeta(item.id)">
+        <div class="meta-superior">
+          <span class="taller-badge">{{ item.nombre_taller }}</span>
+          <span class="estrellas-display" [attr.aria-label]="item.calificacion + ' de 5 estrellas'">
+            <ng-container *ngFor="let n of [1, 2, 3, 4, 5]">
+              <span [class.llena]="n <= item.calificacion">★</span>
+            </ng-container>
+          </span>
+        </div>
+
+        <div class="titulo-fila">
+          <h4 class="comentario-titulo">{{ item.titulo }}</h4>
+          <span class="indicador-desplegar">
+            {{ expandidoId === item.id ? '▲ Ocultar' : '▼ Ver más' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Contenido desplegable al hacer clic: Descripción + hasta 3 fotos -->
+      <div class="comentario-detalle" *ngIf="expandidoId === item.id">
+        <p class="comentario-descripcion">{{ item.descripcion }}</p>
+
+        <div class="galeria-fotos" *ngIf="item.fotos && item.fotos.length > 0">
+          <img
+            *ngFor="let foto of item.fotos.slice(0, 3); let idx = index"
+            [src]="foto"
+            [alt]="'Foto ' + (idx + 1) + ' de ' + item.titulo"
+          />
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
