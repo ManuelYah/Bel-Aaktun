@@ -14,9 +14,7 @@
       <label>CALIDAD</label>
       <select [(ngModel)]="calidadSeleccionada" (change)="aplicarFiltros()">
         <option value="todas">Todas las calidades</option>
-        <option value="Fina">Fina</option>
-        <option value="Superfina">Superfina</option>
-        <option value="Gruesa">Gruesa</option>
+        <option *ngFor="let cal of calidadesDisponibles" [value]="cal">{{ cal }}</option>
       </select>
     </div>
 
@@ -38,8 +36,11 @@
     </div>
   </div>
 
-  <div class="limpiar-container">
-    <button class="btn-limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
+  <div class="acciones-barra-superior">
+    <button type="button" class="btn-limpiar" (click)="limpiarFiltros()">Limpiar filtros</button>
+    <button type="button" class="btn-ir-foro" (click)="irAlForo()">
+      💬 Ver Foro de Reseñas
+    </button>
   </div>
 
   <!-- Estado de Carga -->
@@ -54,17 +55,28 @@
 
   <!-- Grid de Productos / Artesanías -->
   <div *ngIf="!cargando && filteredArtesanias.length > 0" class="productos-grid">
-    <div *ngFor="let item of filteredArtesanias" class="producto-card">
+    <div *ngFor="let item of filteredArtesanias" class="producto-card" data-testid="producto-card">
       <div class="card-img-container">
         <img [src]="item.imagen_url || 'assets/placeholder.jpg'" [alt]="item.nombre_pieza || item.nombre_taller" class="producto-img">
         <span class="badge-calidad">{{ item.calidad || item.calidad_partidas || 'Fina' }}</span>
       </div>
       
       <div class="card-body">
-        <!-- Nombre del Taller / Cueva -->
-        <span class="taller-tag">
-          📍 {{ item.nombre_taller || 'Taller Artesanal' }}
-        </span>
+        <!-- Nombre del Taller / Cueva + Calificación -->
+        <div class="taller-tag-row">
+          <span class="taller-tag">
+            📍 {{ item.nombre_taller || 'Taller Artesanal' }}
+          </span>
+          <span
+            class="rating-pill"
+            *ngIf="getTotalResenasItem(item) > 0; else sinResenasCatalogo">
+            ★ {{ getPromedioItem(item) | number:'1.1-1' }}
+            <small>({{ getTotalResenasItem(item) }})</small>
+          </span>
+          <ng-template #sinResenasCatalogo>
+            <span class="rating-pill sin-resenas">★ Nuevo</span>
+          </ng-template>
+        </div>
 
         <!-- Nombre de la Pieza -->
         <h3 class="pieza-titulo">
@@ -101,7 +113,16 @@
 
       <!-- Información del Producto y Taller -->
       <div class="modal-info-col">
-        <span class="modal-taller-tag">📍 {{ productoSeleccionado.nombre_taller || 'Taller Artesanal' }}</span>
+        <div class="taller-tag-row">
+          <span class="modal-taller-tag">📍 {{ productoSeleccionado.nombre_taller || 'Taller Artesanal' }}</span>
+          <span
+            class="rating-pill"
+            *ngIf="getTotalResenasItem(productoSeleccionado) > 0">
+            ★ {{ getPromedioItem(productoSeleccionado) | number:'1.1-1' }}
+            <small>({{ getTotalResenasItem(productoSeleccionado) }} reseñas)</small>
+          </span>
+        </div>
+
         <h2 class="modal-title">{{ productoSeleccionado.nombre_pieza || productoSeleccionado.nombre_taller }}</h2>
         <p class="modal-precio">${{ (productoSeleccionado.precio || productoSeleccionado.precio_promedio || 0) | number:'1.2-2' }} MXN</p>
         <span class="badge-calidad-modal">Calidad: {{ productoSeleccionado.calidad || productoSeleccionado.calidad_partidas || 'Fina' }}</span>

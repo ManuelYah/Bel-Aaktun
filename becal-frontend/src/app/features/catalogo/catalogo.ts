@@ -1,8 +1,11 @@
+import { API_URL } from '../../core/api.config';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Artesania } from '../../core/models/artesania.model';
+import { ForoService, ResumenCalificacion } from '../../core/services/foro-talleres.service';
 
 interface TallerFiltro {
   id: number;
@@ -20,6 +23,8 @@ export class catalogo implements OnInit {
   artesanias: Artesania[] = [];
   filteredArtesanias: Artesania[] = [];
   talleres: TallerFiltro[] = [];
+  calidadesDisponibles: string[] = [];
+  resumenCalificaciones: Record<number, ResumenCalificacion> = {};
   cargando: boolean = true;
 
   // Filtros
@@ -41,23 +46,53 @@ export class catalogo implements OnInit {
     cantidad: 1
   };
 
-  private baseUrl = 'http://localhost:5000/api';
+  private baseUrl = API_URL;
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private foroService: ForoService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
+    this.cargarResumenCalificaciones();
     this.cargarProductos();
+  }
+
+  irAlForo(): void {
+    this.router.navigate(['/foro-talleres']);
+  }
+
+  cargarResumenCalificaciones(): void {
+    this.foroService.obtenerResumenCalificaciones().subscribe({
+      next: (res) => {
+        this.resumenCalificaciones = res || {};
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error cargando calificaciones del foro en catálogo:', err);
+      }
+    });
+  }
+
+  getPromedioItem(item: any): number {
+    const tallerId = Number(item?.taller_id ?? item?.artesano_id ?? 0);
+    return Number(this.resumenCalificaciones[tallerId]?.promedio_calificacion ?? 0);
+  }
+
+  getTotalResenasItem(item: any): number {
+    const tallerId = Number(item?.taller_id ?? item?.artesano_id ?? 0);
+    return Number(this.resumenCalificaciones[tallerId]?.total_resenas ?? 0);
   }
 
   cargarProductos(): void {
     this.cargando = true;
     this.http.get<Artesania[]>(`${this.baseUrl}/productos`).subscribe({
       next: (data) => {
-        this.artesanias = data;
-        this.extraerTalleresUnicos(data);
+        this.artesanias = data || [];
+        this.extraerTalleresUnicos(this.artesanias);
+        this.extraerCalidadesUnicas(this.artesanias);
         this.aplicarFiltros();
         this.cargando = false;
         this.cdr.detectChanges();
@@ -75,12 +110,32 @@ export class catalogo implements OnInit {
     data.forEach((item: any) => {
       const tallerId = item.taller_id || item.artesano_id;
       const nombreTaller = item.nombre_taller || 'Taller Artesanal';
-      
+
       if (tallerId && !mapaTalleres.has(tallerId)) {
         mapaTalleres.set(tallerId, { id: tallerId, nombre: nombreTaller });
       }
     });
     this.talleres = Array.from(mapaTalleres.values());
+  }
+
+  extraerCalidadesUnicas(data: Artesania[]): void {
+    const mapaCalidades = new Map<string, string>();
+    data.forEach((item: any) => {
+      const calidadRaw = (item.calidad || item.calidad_partidas || '').trim();
+      if (calidadRaw) {
+        const clave = calidadRaw.toLowerCase();
+        if (!mapaCalidades.has(clave)) {
+          mapaCalidades.set(clave, calidadRaw);
+        }
+      }
+    });
+    this.calidadesDisponibles = Array.from(mapaCalidades.values());
+  }
+
+  private obtenerPrecioNumero(item: any): number {
+    const raw = item?.precio ?? item?.precio_promedio ?? 0;
+    const num = Number(raw);
+    return Number.isNaN(num) ? 0 : num;
   }
 
   aplicarFiltros(): void {
@@ -89,29 +144,27 @@ export class catalogo implements OnInit {
     // 1. Filtrar por Taller
     if (this.tallerSeleccionado !== 'todos') {
       const idTaller = Number(this.tallerSeleccionado);
-      resultado = resultado.filter((item: any) => (item.taller_id || item.artesano_id) === idTaller);
+      resultado = resultado.filter((item: any) => Number(item.taller_id || item.artesano_id) === idTaller);
     }
 
     // 2. Filtrar por Calidad
     if (this.calidadSeleccionada !== 'todas') {
+      const objetivo = this.calidadSeleccionada.trim().toLowerCase();
       resultado = resultado.filter((item: any) => {
-        const calidadItem = item.calidad || item.calidad_partidas || '';
-        return calidadItem.toLowerCase() === this.calidadSeleccionada.toLowerCase();
+        const calidadItem = (item.calidad || item.calidad_partidas || '').trim().toLowerCase();
+        return calidadItem === objetivo;
       });
     }
 
-    // 3. Ordenar por Precio
+    // 3. Ordenar por Precio o por Fecha (sin que se pisen entre sí)
     if (this.ordenPrecio === 'menor_mayor') {
-      resultado.sort((a: any, b: any) => (a.precio || a.precio_promedio || 0) - (b.precio || b.precio_promedio || 0));
+      resultado.sort((a: any, b: any) => this.obtenerPrecioNumero(a) - this.obtenerPrecioNumero(b));
     } else if (this.ordenPrecio === 'mayor_menor') {
-      resultado.sort((a: any, b: any) => (b.precio || b.precio_promedio || 0) - (a.precio || a.precio_promedio || 0));
-    }
-
-    // 4. Ordenar por Fecha
-    if (this.ordenFecha === 'antiguos') {
-      resultado.sort((a: any, b: any) => (a.id || 0) - (b.id || 0));
+      resultado.sort((a: any, b: any) => this.obtenerPrecioNumero(b) - this.obtenerPrecioNumero(a));
+    } else if (this.ordenFecha === 'antiguos') {
+      resultado.sort((a: any, b: any) => Number(a.id || 0) - Number(b.id || 0));
     } else {
-      resultado.sort((a: any, b: any) => (b.id || 0) - (a.id || 0));
+      resultado.sort((a: any, b: any) => Number(b.id || 0) - Number(a.id || 0));
     }
 
     this.filteredArtesanias = resultado;

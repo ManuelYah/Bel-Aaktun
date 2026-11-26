@@ -27,32 +27,53 @@
     <!-- Form Card -->
     <div class="form-card">
       <h3>Envíanos un mensaje directo</h3>
-      <form>
+      <form (ngSubmit)="enviarMensaje()">
         <div class="form-group">
           <label for="nombre">Nombre completo</label>
-          <input type="text" id="nombre" [(ngModel)]="nombre" name="nombre" placeholder="Tu nombre" required>
+          <input type="text" id="nombre" data-testid="contacto-nombre" [(ngModel)]="nombre" name="nombre" placeholder="Tu nombre" required>
         </div>
 
         <div class="form-group">
-          <label for="telefono">Teléfono (opcional)</label>
-          <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono" placeholder="Tu número">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" data-testid="contacto-email" [(ngModel)]="email" name="email" placeholder="tucorreo@ejemplo.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" [(ngModel)]="telefono" name="telefono" placeholder="Tu número" autocomplete="tel">
+          <small class="ayuda">Déjanos al menos un correo o un teléfono para responderte.</small>
+        </div>
+
+        <!-- Campo trampa para bots -->
+        <div class="campo-trampa" aria-hidden="true">
+          <label for="website">No llenar este campo</label>
+          <input type="text" id="website" [(ngModel)]="website" name="website" tabindex="-1" autocomplete="off">
         </div>
 
         <div class="form-group">
           <label for="mensaje">Mensaje o Consulta</label>
-          <textarea id="mensaje" [(ngModel)]="mensaje" name="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
+          <textarea id="mensaje" data-testid="contacto-mensaje" [(ngModel)]="mensaje" name="mensaje" rows="4" placeholder="¿En qué podemos ayudarte?" required></textarea>
         </div>
 
-        <!-- Grupo de botones -->
+        @if (exito) {
+          <div class="aviso aviso-ok" data-testid="contacto-ok" role="status">{{ exito }}</div>
+        }
+        @if (error) {
+          <div class="aviso aviso-error" role="alert">{{ error }}</div>
+        }
+
         <div class="form-actions">
-          <button type="button" (click)="enviarWhatsApp()" class="btn-whatsapp">
-            Enviar a WhatsApp
-          </button>
-          
-          <button type="button" (click)="enviarCorreo()" class="btn-email">
-            Enviar por Correo
+          <button type="submit" class="btn-enviar" data-testid="contacto-enviar" [disabled]="enviando">
+            {{ enviando ? 'Enviando...' : 'Enviar mensaje' }}
           </button>
         </div>
+
+        <p class="alternativas">
+          También puedes escribirnos por
+          <button type="button" class="enlace" (click)="enviarWhatsApp()">WhatsApp</button>
+          o
+          <button type="button" class="enlace" (click)="enviarCorreo()">correo</button>.
+        </p>
       </form>
     </div>
 

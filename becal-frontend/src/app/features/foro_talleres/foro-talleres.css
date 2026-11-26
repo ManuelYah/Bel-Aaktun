@@ -1,0 +1,391 @@
+.foro-wrapper {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #2c221e;
+}
+
+.foro-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.foro-header h2 {
+  margin: 0 0 0.25rem;
+  color: #7c2d12;
+}
+
+.subtitulo {
+  margin: 0;
+  color: #6b5b53;
+  font-size: 0.95rem;
+}
+
+.acciones-principales {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-primario,
+.btn-secundario {
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn-primario {
+  background-color: #c2410c;
+  color: #fff;
+}
+
+.btn-secundario {
+  background-color: #f3ece4;
+  color: #431407;
+  border: 1px solid #d6c7b8;
+}
+
+.btn-primario:hover:not(:disabled),
+.btn-secundario:hover:not(:disabled) {
+  opacity: 0.92;
+}
+
+.btn-primario:disabled,
+.btn-secundario:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.alerta {
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+
+.alerta.exito {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.alerta.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.card-formulario {
+  background: #fffdfb;
+  border: 1px solid #e5d8c9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.75rem;
+  box-shadow: 0 4px 14px rgba(44, 34, 30, 0.06);
+}
+
+.form-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-top h3 {
+  margin: 0;
+  color: #7c2d12;
+}
+
+.btn-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6b5b53;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo.full-ancho {
+  grid-column: 1 / -1;
+}
+
+.campo label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3f2e26;
+}
+
+.campo input[type='text'],
+.campo textarea,
+.barra-filtro select {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d4c3b3;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #2c221e;
+}
+
+.estrellas-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.estrella-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.6rem;
+  color: #d6ccc2;
+  cursor: pointer;
+  padding: 0;
+}
+
+.estrella-btn.activa {
+  color: #d97706;
+}
+
+.puntaje-texto {
+  margin-left: 0.4rem;
+  font-weight: 600;
+  color: #6b5b53;
+}
+
+.ayuda {
+  color: #7c6a60;
+  font-size: 0.8rem;
+}
+
+.preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.preview-item {
+  position: relative;
+  width: 92px;
+  height: 92px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #dfd2c4;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-quitar {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.form-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.barra-filtro {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.lista-comentarios {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.comentario-card {
+  background: #ffffff;
+  border: 1px solid #e7dbd0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.comentario-card:hover,
+.comentario-card.expandida {
+  border-color: #c2410c;
+  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.08);
+}
+
+.comentario-resumen {
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+}
+
+.meta-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.taller-badge {
+  background-color: #fff3e8;
+  color: #9a3412;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+}
+
+.estrellas-display span {
+  color: #e2d9d0;
+  font-size: 1.05rem;
+}
+
+.estrellas-display span.llena {
+  color: #d97706;
+}
+
+.titulo-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.comentario-titulo {
+  margin: 0;
+  font-size: 1.08rem;
+  color: #2c221e;
+}
+
+.indicador-desplegar {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #c2410c;
+  white-space: nowrap;
+}
+
+.comentario-detalle {
+  padding: 0 1.25rem 1.25rem;
+  border-top: 1px solid #f2e8df;
+  background-color: #fffdfa;
+}
+
+.comentario-descripcion {
+  margin: 0.9rem 0 1rem;
+  line-height: 1.55;
+  color: #3f332d;
+  white-space: pre-line;
+}
+
+.galeria-fotos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.galeria-fotos img {
+  width: 100%;
+  max-height: 320px;
+  height: auto;
+  object-fit: contain;
+  background-color: #fdf8f3;
+  border-radius: 8px;
+  border: 1px solid #e5d8c9;
+  padding: 0.25rem;
+}
+
+.estado-vacio {
+  text-align: center;
+  padding: 2rem;
+  color: #6b5b53;
+  background: #fffdfb;
+  border: 1px dashed #dfd2c4;
+  border-radius: 10px;
+}
+
+.foro-wrapper {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  padding: 6.5rem 1rem 2rem; /* <-- suficiente espacio superior para que el navbar no tape el título */
+  color: #2c221e;
+}
+
+.lista-archivos {
+  list-style: none;
+  padding: 0;
+  margin: 0.6rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.archivo-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fdf8f3;
+  border: 1px solid #e2d2c3;
+  border-radius: 8px;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.88rem;
+}
+
+.mini-thumb {
+  width: 38px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.archivo-nombre {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-quitar-archivo {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-quitar-archivo:hover {
+  background: #fecaca;
+}

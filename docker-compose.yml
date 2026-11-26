@@ -4,29 +4,97 @@ services:
     container_name: becal_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: becal_db
-      MYSQL_USER: becal_user
-      MYSQL_PASSWORD: becal_pass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-becal_db}
+      MYSQL_USER: ${DB_USER:-becal_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-becal_pass}
     ports:
-      - "3307:3306"
+      # Solo accesible desde tu equipo
+      - "127.0.0.1:3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./becal-backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./becal-backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
 
   backend:
     build: ./becal-backend
     container_name: becal_flask
     restart: always
-    ports:
-      - "5000:5000"
+    # Sin "ports": solo nginx (servicio web) lo alcanza, por la red interna.
+    expose:
+      - "5000"
     environment:
       DB_HOST: mysql_db
-      DB_USER: becal_user
-      DB_PASSWORD: becal_pass
-      DB_NAME: becal_db
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-becal_user}
+      DB_PASSWORD: ${DB_PASSWORD:-becal_pass}
+      DB_NAME: ${DB_NAME:-becal_db}
+      SECRET_KEY: ${SECRET_KEY:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_NOMBRE: ${ADMIN_NOMBRE:-Administrador}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200,http://127.0.0.1:4200}
+      TRUST_PROXY: "1"
+      CONTACTO_MAX_POR_HORA: ${CONTACTO_MAX_POR_HORA:-5}
+      MAIL_SUPPRESS_SEND: ${MAIL_SUPPRESS_SEND:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-}
+    volumes:
+      - uploads_data:/app/app/static/uploads
     depends_on:
-      - mysql_db
+      mysql_db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; urllib.request.urlopen('http://127.0.0.1:5000/apidocs/', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: becal-frontend/Dockerfile
+    container_name: becal_web
+    restart: always
+    ports:
+      - "${WEB_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # --- Pruebas Selenium (solo con: docker compose --profile e2e ...) ---
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: becal_selenium
+    profiles: ["e2e"]
+    shm_size: "2gb"
+    depends_on:
+      - web
+
+  e2e:
+    build: ./e2e
+    container_name: becal_e2e
+    profiles: ["e2e"]
+    depends_on:
+      - selenium
+      - web
+    environment:
+      BASE_URL: http://web
+      SELENIUM_REMOTE_URL: http://selenium:4444/wd/hub
+      E2E_ADMIN_EMAIL: ${E2E_ADMIN_EMAIL:-e2e-admin@belaaktun.test}
+      E2E_ADMIN_PASSWORD: ${E2E_ADMIN_PASSWORD:-}
+      E2E_ARTESANO_EMAIL: ${E2E_ARTESANO_EMAIL:-acosta@belaaktun.com}
+      E2E_ARTESANO_PASSWORD: ${E2E_ARTESANO_PASSWORD:-}
+    volumes:
+      - ./e2e/reports:/e2e/reports
 
 volumes:
   mysql_data:
+  uploads_data:

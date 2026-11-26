@@ -43,11 +43,13 @@ export class Login {
           localStorage.setItem('usuario', JSON.stringify(userData));
         }
 
-        this.router.navigate(['/dashboard']);
+        this.router.navigate([userData?.rol === 'ADMIN' ? '/admin' : '/dashboard']);
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Credenciales incorrectas. Inténtalo de nuevo.';
+        this.errorMessage = err.status === 0
+          ? 'No se pudo conectar con el servidor. Inténtalo de nuevo en unos minutos.'
+          : err.error?.error || err.error?.message || 'Credenciales incorrectas. Inténtalo de nuevo.';
       }
     });
   }

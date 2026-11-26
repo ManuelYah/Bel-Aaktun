@@ -4,9 +4,12 @@ import { catalogo } from './features/catalogo/catalogo'; // Catalogo de artesani
 import { Cuevasmapa } from './features/cuevas-mapa/cuevas-mapa'; // Mapa de cuevas y talleres
 import { Contacto } from './features/contacto/contacto'; // Formulario de contacto
 import { CrearReserva } from './features/reserva/reserva'; // Componente para crear reservas
-import { authGuard } from './core/guards/auth-guard'; // Guard para proteger rutas
+import { adminGuard, artesanoGuard } from './core/guards/auth-guard'; // Guards para proteger rutas por rol
 import { Dashboard } from './features/dashboard/dashboard'; // Componente del dashboard
 import { Login } from './features/auth/login/login'; // Componente de login
+import { Seguimiento } from './features/seguimiento/seguimiento'; // Componente de seguimiento
+import { ForoTalleres } from './features/foro_talleres/foro-talleres'; // Componente del foro de talleres
+import { Admin } from './features/admin/admin'; // Panel del administrador
 
 export const routes: Routes = [
   { path: '', component: Home }, // Muestra Home al entrar a localhost:4200
@@ -14,7 +17,11 @@ export const routes: Routes = [
   { path: 'cuevas-mapa', component: Cuevasmapa }, // Muestra el mapa de cuevas y talleres
   { path: 'crear-reserva', component: CrearReserva }, // Muestra el formulario para crear reservas
   { path: 'contacto', component: Contacto }, // Muestra el formulario de contacto
-  { path: 'dashboard', component: Dashboard, canActivate: [authGuard] }, // Muestra el dashboard solo si el usuario está autenticado
+  { path: 'dashboard', component: Dashboard, canActivate: [artesanoGuard] }, // Panel del artesano (un administrador va a /admin)
+  { path: 'admin', component: Admin, canActivate: [adminGuard] }, // Panel del administrador: reseñas y mensajes
   { path: 'login', component: Login }, // Muestra el formulario de login 
-  { path: '**', redirectTo: '' }         
+  { path: 'seguimiento', component: Seguimiento }, // Muestra el componente de seguimiento
+  { path: 'foro-talleres', component: ForoTalleres }, // Muestra el foro de talleres
+  { path: '**', redirectTo: '' }          
+  
 ];

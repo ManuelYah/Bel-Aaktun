@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { API_URL } from '../api.config';
 import { Observable } from 'rxjs';
 import { Artesania } from '../models/artesania.model';
 
@@ -7,7 +8,7 @@ import { Artesania } from '../models/artesania.model';
   providedIn: 'root'
 })
 export class ArtesaniasService {
-  private apiUrl = 'http://127.0.0.1:5000/api/productos';
+  private apiUrl = `${API_URL}/productos`;
 
   constructor(private http: HttpClient) {}
 
