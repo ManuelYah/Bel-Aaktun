@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -27,11 +27,15 @@ export class Seguimiento {
   filtroEstado: string = '';
   limiteVisible: number = 5;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   buscarSeguimiento(): void {
     if (!this.terminoBusqueda.trim()) {
       this.mensajeError = 'Ingresa un correo, teléfono o número de folio válido.';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -39,25 +43,30 @@ export class Seguimiento {
     this.mensajeError = '';
     this.datosBrutos = null;
     this.limiteVisible = 5;
+    this.cdr.detectChanges();
 
     this.http.post(`${this.baseUrl}/seguimiento`, { contacto: this.terminoBusqueda }).subscribe({
       next: (res: any) => {
         this.datosBrutos = res;
         this.cargando = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.cargando = false;
         this.mensajeError = err.error?.error || 'No se encontraron registros.';
+        this.cdr.detectChanges();
       }
     });
   }
 
   abrirDetalle(item: any): void {
     this.itemSeleccionado = item;
+    this.cdr.detectChanges();
   }
 
   cerrarDetalle(): void {
     this.itemSeleccionado = null;
+    this.cdr.detectChanges();
   }
 
   get talleresDisponibles(): string[] {
@@ -101,5 +110,6 @@ export class Seguimiento {
 
   cargarMas(): void {
     this.limiteVisible += 5;
+    this.cdr.detectChanges();
   }
 }

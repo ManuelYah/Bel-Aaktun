@@ -362,3 +362,11 @@
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.seguimiento-wrapper {
+  padding: 40px 20px; /* Asegura espacio alrededor */
+  margin-top: 40px;  /* <--- Agrega este espacio respecto al navbar */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

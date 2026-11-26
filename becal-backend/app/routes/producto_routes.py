@@ -4,8 +4,62 @@ from app.extensions import get_db_connection
 
 producto_bp = Blueprint('producto_bp', __name__)
 
+
 @producto_bp.route('/productos', methods=['GET', 'POST', 'OPTIONS'])
 def handle_productos():
+    """
+    Listar o crear piezas artesanales / productos
+    ---
+    tags:
+      - Productos
+    consumes:
+      - application/json
+    parameters:
+      - name: taller_id
+        in: query
+        type: integer
+        required: false
+        description: Filtra los productos por ID de taller/artesano (solo aplica en GET)
+      - in: body
+        name: body
+        required: false
+        description: Requerido en POST para crear un producto
+        schema:
+          type: object
+          required:
+            - nombre_pieza
+          properties:
+            artesano_id:
+              type: integer
+              example: 1
+            taller_id:
+              type: integer
+              example: 1
+            nombre_pieza:
+              type: string
+              example: "Sombrero de jipi tejido a mano"
+            descripcion:
+              type: string
+              example: "Elaborado con fibra natural de palma de jipi"
+            precio:
+              type: number
+              example: 850
+            calidad:
+              type: string
+              example: "Fina"
+            imagenes:
+              type: array
+              items:
+                type: string
+              example: ["https://ejemplo.com/sombrero1.jpg"]
+    responses:
+      200:
+        description: Lista de productos obtenida correctamente (GET)
+      201:
+        description: Producto creado con éxito (POST)
+      500:
+        description: Error interno del servidor
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
@@ -75,8 +129,26 @@ def handle_productos():
             print("ERROR EXACTO AL GUARDAR PRODUCTO:", str(e))
             return jsonify({'error': str(e)}), 500
 
+
 @producto_bp.route('/productos/taller/<int:taller_id>', methods=['GET', 'OPTIONS'])
 def obtener_productos_por_taller(taller_id):
+    """
+    Obtener productos filtrados por taller
+    ---
+    tags:
+      - Productos
+    parameters:
+      - name: taller_id
+        in: path
+        type: integer
+        required: true
+        description: ID del taller o artesano
+    responses:
+      200:
+        description: Listado de productos del taller indicado
+      500:
+        description: Error al consultar los productos por taller
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
     try:
@@ -110,8 +182,54 @@ def obtener_productos_por_taller(taller_id):
         print("Error en productos por taller:", str(e))
         return jsonify({'error': str(e)}), 500
 
+
 @producto_bp.route('/productos/<int:producto_id>', methods=['DELETE', 'PUT', 'OPTIONS'])
 def gestionar_producto_individual(producto_id):
+    """
+    Actualizar o eliminar un producto por su ID
+    ---
+    tags:
+      - Productos
+    consumes:
+      - application/json
+    parameters:
+      - name: producto_id
+        in: path
+        type: integer
+        required: true
+        description: ID del producto
+      - in: body
+        name: body
+        required: false
+        description: Campos para actualizar en PUT
+        schema:
+          type: object
+          required:
+            - nombre_pieza
+          properties:
+            nombre_pieza:
+              type: string
+              example: "Sombrero de jipi extra fino"
+            descripcion:
+              type: string
+              example: "Tejido fino de alta calidad"
+            precio:
+              type: number
+              example: 1200
+            calidad:
+              type: string
+              example: "Extra fina"
+            imagenes:
+              type: array
+              items:
+                type: string
+              example: ["https://ejemplo.com/sombrero-fino.jpg"]
+    responses:
+      200:
+        description: Producto actualizado (PUT) o eliminado (DELETE) con éxito
+      500:
+        description: Error al actualizar o eliminar el producto
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 

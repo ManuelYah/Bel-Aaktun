@@ -3,14 +3,44 @@ from app.extensions import get_db_connection
 
 seguimiento_bp = Blueprint('seguimiento_bp', __name__)
 
+
 # ==========================================
 # CONSULTAR ESTADO POR CONTACTO O FOLIO
 # ==========================================
 @seguimiento_bp.route('/seguimiento', methods=['POST', 'OPTIONS'])
 def consultar_seguimiento():
+    """
+    Consultar estado de reservas y apartados por contacto o folio
+    ---
+    tags:
+      - Seguimiento
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - contacto
+          properties:
+            contacto:
+              type: string
+              example: "RES-001"
+    responses:
+      200:
+        description: Coincidencias encontradas en reservas y/o apartados
+      400:
+        description: Falta ingresar correo, teléfono o folio
+      404:
+        description: No se encontraron registros
+      500:
+        description: Error interno del servidor
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
-    
+
     data = request.get_json() or {}
     contacto = data.get('contacto', '').strip()
 
@@ -22,7 +52,6 @@ def consultar_seguimiento():
     try:
         conn = get_db_connection(current_app.config)
         with conn.cursor() as cursor:
-            # Consultar Reservas unificando fecha y hora
             sql_reservas = """
                 SELECT r.id, 'reserva' as tipo, r.nombre_visitante as nombre, 
                        r.email_visitante as email, r.telefono_visitante as telefono, 
@@ -37,7 +66,6 @@ def consultar_seguimiento():
             cursor.execute(sql_reservas, (contacto, contacto, contacto_limpio if contacto_limpio.isdigit() else 0))
             reservas = cursor.fetchall()
 
-            # Consultar Apartados usando fecha_creacion y productos relacionados
             sql_apartados = """
                 SELECT ap.id, 'apartado' as tipo, ap.nombre_cliente as nombre, 
                        ap.email_cliente as email, ap.telefono_cliente as telefono, 

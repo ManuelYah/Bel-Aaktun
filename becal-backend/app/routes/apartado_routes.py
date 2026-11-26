@@ -5,8 +5,52 @@ from app.models import generar_folio
 
 apartado_bp = Blueprint('apartado_bp', __name__)
 
+
 @apartado_bp.route('/apartados', methods=['POST', 'OPTIONS'])
 def crear_apartado():
+    """
+    Crear una solicitud de apartado de producto artesanal
+    ---
+    tags:
+      - Apartados
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - producto_id
+            - taller_id
+            - nombre_cliente
+            - email_cliente
+          properties:
+            producto_id:
+              type: integer
+              example: 3
+            taller_id:
+              type: integer
+              example: 1
+            nombre_cliente:
+              type: string
+              example: "Luis Dzib"
+            email_cliente:
+              type: string
+              example: "luis@ejemplo.com"
+            telefono_cliente:
+              type: string
+              example: "9997654321"
+            cantidad:
+              type: integer
+              example: 2
+    responses:
+      201:
+        description: Apartado creado con éxito, folio APT generado y correo enviado
+      500:
+        description: Error interno del servidor
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
@@ -79,9 +123,26 @@ def crear_apartado():
         print("Error creando apartado:", str(e))
         return jsonify({'error': str(e)}), 500
 
-@apartado_bp.route('/api/apartados/taller/<int:taller_id>', methods=['GET', 'OPTIONS']) # O ajustado si usas url_prefix
+
 @apartado_bp.route('/apartados/taller/<int:taller_id>', methods=['GET', 'OPTIONS'])
 def obtener_apartados_taller(taller_id):
+    """
+    Obtener apartados filtrados por taller
+    ---
+    tags:
+      - Apartados
+    parameters:
+      - name: taller_id
+        in: path
+        type: integer
+        required: true
+        description: ID del taller
+    responses:
+      200:
+        description: Listado de apartados del taller indicado
+      500:
+        description: Error al consultar los apartados por taller
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
     try:
@@ -104,8 +165,41 @@ def obtener_apartados_taller(taller_id):
         print("Error obteniendo apartados:", str(e))
         return jsonify({'error': str(e)}), 500
 
+
 @apartado_bp.route('/apartados/<int:apartado_id>', methods=['PATCH', 'DELETE', 'OPTIONS'])
 def gestionar_apartado(apartado_id):
+    """
+    Actualizar estado/respuesta o eliminar un apartado por su ID
+    ---
+    tags:
+      - Apartados
+    consumes:
+      - application/json
+    parameters:
+      - name: apartado_id
+        in: path
+        type: integer
+        required: true
+        description: ID del apartado
+      - in: body
+        name: body
+        required: false
+        description: Campos para actualizar en PATCH (estado y respuesta_artesano)
+        schema:
+          type: object
+          properties:
+            estado:
+              type: string
+              example: "Confirmado"
+            respuesta_artesano:
+              type: string
+              example: "Tu pieza está lista para recoger en el taller."
+    responses:
+      200:
+        description: Apartado actualizado (PATCH) o eliminado (DELETE) con éxito
+      500:
+        description: Error al actualizar o eliminar el apartado
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 

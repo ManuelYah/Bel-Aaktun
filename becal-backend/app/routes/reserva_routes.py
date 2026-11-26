@@ -5,8 +5,62 @@ from app.models import generar_folio
 
 reserva_bp = Blueprint('reserva_bp', __name__)
 
+
 @reserva_bp.route('/reservas', methods=['GET', 'POST', 'OPTIONS'])
 def handle_reservas():
+    """
+    Listar o crear reservas de visitas a talleres/cuevas
+    ---
+    tags:
+      - Reservas
+    consumes:
+      - application/json
+    parameters:
+      - name: taller_id
+        in: query
+        type: integer
+        required: false
+        description: Filtra las reservas por ID de taller (solo aplica en GET)
+      - in: body
+        name: body
+        required: false
+        description: Requerido en POST para crear una nueva reserva
+        schema:
+          type: object
+          required:
+            - nombre_visitante
+            - email_visitante
+            - fecha_reserva
+          properties:
+            taller_id:
+              type: integer
+              example: 4
+            nombre_visitante:
+              type: string
+              example: "Ana Méndez"
+            email_visitante:
+              type: string
+              example: "ana@ejemplo.com"
+            telefono_visitante:
+              type: string
+              example: "9991234567"
+            numero_personas:
+              type: integer
+              example: 3
+            fecha_reserva:
+              type: string
+              example: "2026-12-05"
+            hora_reserva:
+              type: string
+              example: "10:00"
+    responses:
+      200:
+        description: Lista de reservas obtenida correctamente (GET)
+      201:
+        description: Reserva creada con éxito, folio generado y correo enviado (POST)
+      500:
+        description: Error interno del servidor
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
@@ -98,8 +152,26 @@ def handle_reservas():
             print("Error creando reserva:", str(e))
             return jsonify({'error': str(e)}), 500
 
+
 @reserva_bp.route('/reservas/taller/<int:taller_id>', methods=['GET', 'OPTIONS'])
 def reservas_por_taller(taller_id):
+    """
+    Obtener reservas filtradas por taller
+    ---
+    tags:
+      - Reservas
+    parameters:
+      - name: taller_id
+        in: path
+        type: integer
+        required: true
+        description: ID del taller o artesanía
+    responses:
+      200:
+        description: Listado de reservas del taller indicado
+      500:
+        description: Error al consultar las reservas por taller
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
     try:
@@ -121,8 +193,41 @@ def reservas_por_taller(taller_id):
         print("Error en reservas por taller:", str(e))
         return jsonify({'error': str(e)}), 500
 
+
 @reserva_bp.route('/reservas/<int:reserva_id>', methods=['PATCH', 'DELETE', 'OPTIONS'])
 def gestionar_reserva(reserva_id):
+    """
+    Actualizar estado/respuesta o eliminar una reserva
+    ---
+    tags:
+      - Reservas
+    consumes:
+      - application/json
+    parameters:
+      - name: reserva_id
+        in: path
+        type: integer
+        required: true
+        description: ID de la reserva
+      - in: body
+        name: body
+        required: false
+        description: Campos para actualizar en PATCH (estado y respuesta_artesano)
+        schema:
+          type: object
+          properties:
+            estado:
+              type: string
+              example: "Confirmada"
+            respuesta_artesano:
+              type: string
+              example: "¡Te esperamos a las 10:00 hrs en la entrada principal!"
+    responses:
+      200:
+        description: Reserva actualizada (PATCH) o eliminada (DELETE) con éxito
+      500:
+        description: Error al actualizar o eliminar la reserva
+    """
     if request.method == 'OPTIONS':
         return jsonify({'status': 'ok'}), 200
 
